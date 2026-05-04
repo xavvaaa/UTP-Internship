@@ -1,0 +1,436 @@
+/* Main container */
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Loading state */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: 1rem;
+}
+
+.loadingState h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.loadingState p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+  color: var(--ifmod-accent);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Error state */
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.errorIcon {
+  color: #dc2626;
+}
+
+.errorState h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.errorState p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+  max-width: 400px;
+}
+
+.errorActions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.primaryBtn {
+  background: var(--ifmod-accent);
+  color: white;
+}
+
+.primaryBtn:hover {
+  background: #6366f1;
+}
+
+.secondaryBtn {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.secondaryBtn:hover {
+  background: #e5e7eb;
+}
+
+/* Flight information */
+.flightInfo {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.flightHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.flightIcon {
+  color: var(--ifmod-accent);
+}
+
+.flightTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.flightDetails {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.flightDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.flightLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+}
+
+.flightValue {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.flightValue.active {
+  color: #059669;
+}
+
+.flightValue.inactive {
+  color: #dc2626;
+}
+
+.toolbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.7rem;
+  background: var(--ifmod-surface);
+}
+
+.toolbarIcon {
+  color: var(--ifmod-accent);
+  display: flex;
+  margin-top: 0.1rem;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ifmod-muted);
+  line-height: 1.45;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.item {
+  margin: 0;
+}
+
+.choiceGroup {
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.choiceTitle {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.choices {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ifmod-muted);
+  background: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.55rem;
+}
+
+.centerMuted {
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--ifmod-muted);
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.alert {
+  margin: 0 0 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.875rem;
+  color: var(--ifmod-danger);
+}
+
+.emptyHint {
+  margin: 0.5rem 0 1rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.55rem;
+  border: 1px solid var(--ifmod-border);
+  background: var(--ifmod-surface);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.emptyTitle {
+  margin: 0 0 0.4rem;
+  font-weight: 600;
+  color: var(--ifmod-text);
+}
+.emptyBody {
+  margin: 0;
+  color: var(--ifmod-muted);
+}
+.code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.82em;
+  color: var(--ifmod-accent);
+}
+
+.sections {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.6rem;
+}
+
+.grabList {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.grabItem {
+  margin: 0;
+}
+
+.seatForm {
+  margin-bottom: 0.9rem;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.7rem;
+  background: var(--ifmod-surface);
+}
+
+.seatRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.seatIcon {
+  color: var(--ifmod-accent);
+  display: flex;
+  padding: 0.45rem 0 0.35rem;
+}
+
+.seatLabel {
+  flex: 1;
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--ifmod-muted);
+}
+
+.seatInput {
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  background: #fff;
+  color: var(--ifmod-text);
+  padding: 0.45rem 0.55rem;
+  font: inherit;
+  text-transform: uppercase;
+}
+
+.seatBtn {
+  border: 1px solid var(--ifmod-border);
+  background: var(--ifmod-accent);
+  color: #fff;
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.65rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.seatErr {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--ifmod-danger);
+}
+
+.seatSection {
+  margin-bottom: 1.2rem;
+  padding: 0.8rem 0.9rem;
+  border: 2px solid var(--ifmod-accent);
+  border-radius: 0.8rem;
+  background: linear-gradient(135deg, var(--ifmod-surface) 0%, rgba(59, 130, 246, 0.05) 100%);
+}
+
+.seatConfirmation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.seatInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.seatInfoIcon {
+  color: var(--ifmod-accent);
+  display: flex;
+  font-size: 1.2rem;
+}
+
+.seatInfoText {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.seatInfoLabel {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ifmod-muted);
+  font-weight: 500;
+}
+
+.seatInfoValue {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--ifmod-text);
+  font-weight: 600;
+}
+
+.seatActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.seatActionBtn {
+  border: 1px solid var(--ifmod-border);
+  background: var(--ifmod-surface);
+  color: var(--ifmod-text);
+  border-radius: 0.55rem;
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seatActionBtn:hover {
+  background: var(--ifmod-accent);
+  color: #fff;
+  border-color: var(--ifmod-accent);
+}

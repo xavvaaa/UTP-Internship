@@ -1,0 +1,77 @@
+.wrap {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.card {
+  background: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.9rem;
+  padding: 0.75rem 0.8rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.label {
+  color: var(--ifmod-muted);
+  font-size: 0.88rem;
+}
+
+.status {
+  text-transform: capitalize;
+}
+
+.pending {
+  color: #fbbf24;
+}
+
+.preparing {
+  color: #60a5fa;
+}
+
+.delivered {
+  color: #4ade80;
+}
+
+.button {
+  border: 1px solid var(--ifmod-border);
+  background: var(--ifmod-accent-soft);
+  color: var(--ifmod-text);
+  border-radius: 0.6rem;
+  padding: 0.5rem 0.65rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

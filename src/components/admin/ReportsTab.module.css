@@ -1,0 +1,9 @@
+.wrap { display: grid; gap: 0.65rem; }
+.cards { display: grid; gap: 0.55rem; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); }
+.card { margin: 0; background: var(--ifmod-surface); border: 1px solid var(--ifmod-border); border-radius: 0.7rem; padding: 0.6rem; }
+.card p { margin: 0; color: var(--ifmod-muted); font-size: 0.82rem; }
+.card strong { font-size: 1.1rem; }
+.block { background: var(--ifmod-surface); border: 1px solid var(--ifmod-border); border-radius: 0.7rem; padding: 0.6rem; }
+.block h3 { margin: 0 0 0.4rem; font-size: 0.98rem; }
+.block ul { margin: 0; padding-left: 1rem; color: var(--ifmod-muted); }
+.button { border: 1px solid var(--ifmod-border); background: var(--ifmod-accent-soft); color: var(--ifmod-text); border-radius: 0.55rem; padding: 0.45rem 0.65rem; }
