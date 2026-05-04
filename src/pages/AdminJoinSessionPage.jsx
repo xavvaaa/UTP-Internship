@@ -1,14 +1,13 @@
 /**
  * After Firebase login: enter flight access_code to bind dashboard to flight_instance_id.
  */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, Plane, Shield } from 'lucide-react'
+import { Loader2, Plane, Shield, User, ArrowRight, ListTodo, Users, BarChart3 } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import { useAuth } from '../context/useAuth'
 import { useSession } from '../context/useSession'
-import { resolveSessionByCode, createSession } from '../services/flightSessionService'
-import { getAuthToken } from '../utils/authToken'
+import { resolveSessionByCode } from '../services/flightSessionService'
 import styles from './AdminLoginPage.module.css'
 
 export default function AdminJoinSessionPage() {
@@ -18,7 +17,9 @@ export default function AdminJoinSessionPage() {
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [showEmergencyCreate, setShowEmergencyCreate] = useState(false)
+  useEffect(() => {
+    document.title = 'IFMOD | Cabin Crew Login'
+  }, [])
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -53,144 +54,107 @@ export default function AdminJoinSessionPage() {
     }
   }
 
-  async function handleEmergencyCreate(e) {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-    
-    try {
-      const token = await getAuthToken()
-      const now = new Date()
-      const currentTime = now.toTimeString().slice(0, 5)
-      const currentDate = now.toISOString().split('T')[0]
-      
-      const sessionData = {
-        flight_number: 'MH123',
-        date: currentDate,
-        departure_time: currentTime,
-        route: 'KUL-LHR'
-      }
-      
-      const result = await createSession(sessionData, token)
-      if (result.ok) {
-        const newCode = result.session.access_code
-        setCode(newCode)
-        setShowEmergencyCreate(false)
-        setError('')
-        
-        // Auto-join the newly created session
-        setTimeout(() => {
-          handleSubmit(e)
-        }, 500)
-      } else {
-        setError(result.error || 'Failed to create emergency session')
-      }
-    } catch (err) {
-      setError(err?.message || 'Something went wrong')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   return (
-    <PageShell
-      title="Join flight session"
-      subtitle="Enter the access code for this flight"
-      actions={
-        <span className="ifmod-badge" aria-hidden>
-          <Shield size={18} strokeWidth={2} />
-        </span>
-      }
-    >
-      <form className={styles.form} onSubmit={handleSubmit}>
-        {error ? (
-          <p className={styles.alert} role="alert">
-            {error}
+    <div className={styles.loginContainer}>
+      <div className={styles.leftPanel}>
+        <div className={styles.leftContent}>
+          <div className={styles.logoContainer}>
+            <div className={styles.logoSquare}>
+              <Plane size={24} />
+            </div>
+            <div className={styles.logoText}>IFMOD</div>
+          </div>
+          
+          <h1 className={styles.mainHeading}>In-Flight Meal Ordering Dashboard</h1>
+          <div className={styles.accentLine}></div>
+          <p className={styles.description}>
+            Comprehensive system for managing in-flight meal orders, monitoring passenger requests, and overseeing service operations for your assigned flight session.
           </p>
-        ) : null}
-
-        <label className={styles.label}>
-          Access code
-          <input
-            className={styles.input}
-            type="text"
-            autoComplete="off"
-            autoCapitalize="characters"
-            spellCheck={false}
-            value={code}
-            onChange={(ev) => setCode(ev.target.value.toUpperCase())}
-            placeholder="e.g. AB12CD34"
-            disabled={loading}
-          />
-        </label>
-
-        <button type="submit" className={styles.button} disabled={loading}>
-          {loading ? (
-            <>
-              <Loader2 className={styles.spin} size={18} aria-hidden />
-              Joining…
-            </>
-          ) : (
-            <>
-              <Plane size={18} aria-hidden />
-              Continue to dashboard
-            </>
-          )}
-        </button>
-      </form>
-
-      {/* Emergency Access Section */}
-      {role === 'admin' && !showEmergencyCreate && (
-        <div className={styles.emergencySection}>
-          <p className={styles.emergencyText}>
-            Can't find your access code? 
-            <button 
-              type="button" 
-              className={styles.emergencyButton}
-              onClick={() => setShowEmergencyCreate(true)}
-              disabled={loading}
-            >
-              Create Emergency Session
+          
+          <div className={styles.featureCards}>
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>
+                <ListTodo size={20} />
+              </div>
+              <div className={styles.featureContent}>
+                <h3>Manage Orders</h3>
+                <p>Process and track meal orders efficiently</p>
+              </div>
+            </div>
+            
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>
+                <Users size={20} />
+              </div>
+              <div className={styles.featureContent}>
+                <h3>Monitor Requests</h3>
+                <p>Real-time passenger request tracking</p>
+              </div>
+            </div>
+            
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>
+                <BarChart3 size={20} />
+              </div>
+              <div className={styles.featureContent}>
+                <h3>Service Oversight</h3>
+                <p>Analytics and service management</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className={styles.rightPanel}>
+        <div className={styles.loginCard}>
+          <div className={styles.lockBadge}>
+            <User size={32} />
+          </div>
+          
+          <h2 className={styles.loginTitle}>Cabin Crew Login</h2>
+          <p className={styles.loginSubtitle}>Enter the access code for this flight</p>
+          
+          <form className={styles.form} onSubmit={handleSubmit}>
+            {error ? (
+              <p className={styles.alert} role="alert">
+                {error}
+              </p>
+            ) : null}
+            
+            <label className={styles.label}>
+              Access code
+              <div className={styles.inputWrapper}>
+                <User className={styles.inputIcon} size={20} />
+                <input
+                  className={styles.input}
+                  type="text"
+                  autoComplete="off"
+                  autoCapitalize="characters"
+                  spellCheck={false}
+                  value={code}
+                  onChange={(ev) => setCode(ev.target.value.toUpperCase())}
+                  placeholder="e.g. AB12CD34"
+                  disabled={loading}
+                />
+              </div>
+            </label>
+            
+            <button className={styles.button} disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className={styles.spin} size={16} />
+                  Joining...
+                </>
+              ) : (
+                <>
+                  Continue to dashboard
+                  <ArrowRight size={16} />
+                </>
+              )}
             </button>
-          </p>
+          </form>
         </div>
-      )}
-
-      {/* Emergency Create Form */}
-      {showEmergencyCreate && (
-        <div className={styles.emergencyForm}>
-          <h3>Create Emergency Session</h3>
-          <p>This will create a new flight session and automatically join you to it.</p>
-          
-          <button 
-            type="button" 
-            className={`${styles.button} ${styles.emergencyCreateButton}`}
-            onClick={handleEmergencyCreate}
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Loader2 className={styles.spin} size={18} aria-hidden />
-                Creating...
-              </>
-            ) : (
-              <>
-                <Plane size={18} aria-hidden />
-                Create & Join Session
-              </>
-            )}
-          </button>
-          
-          <button 
-            type="button" 
-            className={styles.cancelButton}
-            onClick={() => setShowEmergencyCreate(false)}
-            disabled={loading}
-          >
-            Cancel
-          </button>
-        </div>
-      )}
-    </PageShell>
+      </div>
+    </div>
   )
 }

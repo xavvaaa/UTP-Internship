@@ -30,7 +30,7 @@ export default function App() {
             <Route path="/manual-entry" element={<ManualEntryPage />} />
             <Route path="/admin-login" element={<AdminLoginPage />} />
             <Route
-              path="/admin/join-session"
+              path="/cabin-crew-login"
               element={
                 <RequireRole allowedRoles={['admin', 'crew']}>
                   <AdminJoinSessionPage />
