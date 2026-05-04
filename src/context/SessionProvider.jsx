@@ -10,6 +10,7 @@ const ID_KEY = 'ifmod_flight_instance_id'
 const SEAT_KEY = 'ifmod_seat_number'
 const DATA_KEY = 'ifmod_session_data'
 const ROLE_KEY = 'ifmod_session_role'
+const ACTIVE_SESSION_ID_KEY = 'ifmod_active_session_id'
 
 function readLs(key) {
   try {
@@ -40,6 +41,7 @@ export function SessionProvider({ children }) {
     }
   })
   const [sessionRole, setSessionRoleState] = useState(() => readLs(ROLE_KEY) || null)
+  const [activeSessionId, setActiveSessionIdState] = useState(() => readLs(ACTIVE_SESSION_ID_KEY) || null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -70,15 +72,22 @@ export function SessionProvider({ children }) {
     writeLs(ROLE_KEY, r)
   }, [])
 
+  const setActiveSessionId = useCallback((id) => {
+    setActiveSessionIdState(id)
+    writeLs(ACTIVE_SESSION_ID_KEY, id)
+  }, [])
+
   const clearSession = useCallback(() => {
     setSessionIdState(null)
     setSeatNumberState(null)
     setSessionDataState(null)
     setSessionRoleState(null)
+    setActiveSessionIdState(null)
     setError(null)
     writeLs(ID_KEY, null)
     writeLs(SEAT_KEY, null)
     writeLs(ROLE_KEY, null)
+    writeLs(ACTIVE_SESSION_ID_KEY, null)
     try {
       localStorage.removeItem(DATA_KEY)
     } catch {
@@ -142,6 +151,7 @@ export function SessionProvider({ children }) {
       seatNumber,
       sessionData,
       sessionRole,
+      activeSessionId,
 
       isActive,
       flightNumber,
@@ -157,6 +167,7 @@ export function SessionProvider({ children }) {
       setSession,
       setSessionData,
       setRole,
+      setActiveSessionId,
       clearSession,
     }),
     [
@@ -164,6 +175,7 @@ export function SessionProvider({ children }) {
       seatNumber,
       sessionData,
       sessionRole,
+      activeSessionId,
       isActive,
       flightNumber,
       route,
@@ -176,6 +188,7 @@ export function SessionProvider({ children }) {
       setSession,
       setSessionData,
       setRole,
+      setActiveSessionId,
       clearSession,
     ],
   )

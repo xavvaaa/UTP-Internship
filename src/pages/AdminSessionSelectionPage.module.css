@@ -1,0 +1,455 @@
+.pageContainer {
+  min-height: 100vh;
+  background-color: var(--ifmod-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background-color: var(--ifmod-surface);
+  border-bottom: 1px solid var(--ifmod-border);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.backBtn {
+  position: absolute;
+  top: 1.5rem;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background-color: var(--ifmod-bg);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.5rem;
+  color: var(--ifmod-text);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  background-color: var(--ifmod-accent-soft);
+  border-color: var(--ifmod-accent);
+}
+
+.headerContent {
+  flex: 1;
+  text-align: center;
+  color: var(--ifmod-text);
+}
+
+.headerContent h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ifmod-text);
+}
+
+.headerContent p {
+  margin: 0.5rem 0 0 0;
+  color: var(--ifmod-muted);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--ifmod-muted);
+  font-size: 1rem;
+  background-color: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+}
+
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+  color: var(--ifmod-text);
+}
+
+.emptyIcon {
+  margin-bottom: 1.5rem;
+  color: var(--ifmod-muted);
+}
+
+.empty h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ifmod-text);
+}
+
+.empty p {
+  margin: 0 0 2rem 0;
+  color: var(--ifmod-muted);
+  font-size: 0.875rem;
+}
+
+.sessionList {
+  margin-bottom: 2rem;
+}
+
+.sessionList h2 {
+  color: var(--ifmod-text);
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.sessionCard {
+  background-color: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sessionCard:hover {
+  border-color: var(--ifmod-accent);
+  background-color: var(--ifmod-surface);
+}
+
+.sessionCard.selected {
+  border-color: var(--ifmod-accent);
+  background-color: var(--ifmod-accent-soft);
+}
+
+.sessionInfo {
+  flex: 1;
+}
+
+.flightNumber {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ifmod-text);
+  margin-bottom: 0.375rem;
+}
+
+.sessionDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--ifmod-muted);
+}
+
+.date, .time, .route, .code {
+  padding: 0.1875rem 0.625rem;
+  background-color: var(--ifmod-bg);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+.sessionStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ifmod-success);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.25rem 0.625rem;
+  background-color: var(--ifmod-accent-soft);
+  border: 1px solid var(--ifmod-success);
+  border-radius: 0.375rem;
+}
+
+.currentBadge {
+  position: absolute;
+  top: -0.375rem;
+  right: -0.375rem;
+  background-color: var(--ifmod-accent);
+  color: white;
+  padding: 0.1875rem 0.625rem;
+  border-radius: 0.375rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.footerActions {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.createBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background-color: var(--ifmod-accent);
+  color: white;
+  border: 1px solid var(--ifmod-accent);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.createBtn:hover {
+  background-color: var(--ifmod-text);
+  border-color: var(--ifmod-text);
+}
+
+/* Create Form Styles */
+.createForm {
+  background-color: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  color: var(--ifmod-text);
+}
+
+.formHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ifmod-text);
+}
+
+.formHeader .backBtn {
+  background-color: var(--ifmod-bg);
+  border: 1px solid var(--ifmod-border);
+  color: var(--ifmod-text);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.formHeader .backBtn:hover {
+  background-color: var(--ifmod-accent-soft);
+  border-color: var(--ifmod-accent);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formRow {
+  display: flex;
+  gap: 1rem;
+}
+
+.formGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ifmod-text);
+}
+
+.input {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--ifmod-text);
+  background-color: var(--ifmod-surface);
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--ifmod-accent);
+  box-shadow: 0 0 0 2px var(--ifmod-accent-soft);
+}
+
+.input:disabled {
+  background-color: var(--ifmod-bg);
+  color: var(--ifmod-muted);
+  cursor: not-allowed;
+}
+
+.submitBtn {
+  padding: 0.625rem 1.25rem;
+  background-color: var(--ifmod-accent);
+  color: white;
+  border: 1px solid var(--ifmod-accent);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background-color: var(--ifmod-text);
+  border-color: var(--ifmod-text);
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .headerContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .headerContent h1 {
+    font-size: 1.25rem;
+  }
+
+  .headerContent p {
+    font-size: 0.8rem;
+    max-width: 100%;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .sessionCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .sessionInfo {
+    width: 100%;
+  }
+
+  .flightNumber {
+    font-size: 1rem;
+  }
+
+  .sessionDetails {
+    gap: 0.375rem;
+  }
+
+  .sessionStatus {
+    align-self: flex-start;
+  }
+
+  .formRow {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .createForm {
+    padding: 1rem;
+  }
+
+  .formHeader {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+
+  .formHeader h3 {
+    font-size: 1.125rem;
+  }
+
+  .createBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .submitBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0.75rem;
+  }
+
+  .headerContent h1 {
+    font-size: 1.125rem;
+  }
+
+  .headerContent p {
+    font-size: 0.75rem;
+  }
+
+  .content {
+    padding: 0.75rem;
+  }
+
+  .sessionCard {
+    padding: 0.75rem;
+  }
+
+  .flightNumber {
+    font-size: 0.875rem;
+  }
+
+  .sessionDetails {
+    gap: 0.25rem;
+  }
+
+  .date, .time, .route, .code {
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .createForm {
+    padding: 0.75rem;
+  }
+
+  .createBtn, .submitBtn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}

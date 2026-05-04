@@ -3,7 +3,7 @@
  */
 import { v4 as uuidv4 } from 'uuid'
 import { FieldValue } from 'firebase-admin/firestore'
-import { adminDb } from '../firebaseAdmin.js'
+import { adminDb, adminAuth } from '../firebaseAdmin.js'
 
 const COLLECTION = 'flight_sessions'
 
@@ -62,6 +62,7 @@ function safeSessionPayload(id, data) {
     deleted_at: data.deleted_at ?? null,
     created_at: data.created_at ?? null,
     updated_at: data.updated_at ?? null,
+    assigned_crew_ids: data.assigned_crew_ids ?? [],
   }
 }
 
@@ -100,6 +101,17 @@ export async function resolveSession(req, res) {
     }
 
     const sessionId = doc.id
+    const sessionData = doc.data()
+    
+    // Check crew access control
+    if (req.auth && req.userRole === 'crew') {
+      const assignedCrewIds = sessionData.assigned_crew_ids || []
+      if (!assignedCrewIds.includes(req.auth.uid)) {
+        return res.status(403).json({ 
+          error: 'You are not assigned to this session' 
+        })
+      }
+    }
     
     // Auto-update flightId claims for admin and crew users when session is active
     if (req.auth && (req.userRole === 'admin' || req.userRole === 'crew')) {
@@ -200,7 +212,7 @@ export async function joinPassenger(req, res) {
  */
 export async function createSession(req, res) {
   try {
-    const { flight_number, date, departure_time, route } = req.body ?? {}
+    const { flight_number, date, departure_time, route, assigned_crew_ids } = req.body ?? {}
 
     if (!flight_number?.trim()) {
       return res.status(400).json({ error: 'flight_number is required' })
@@ -246,6 +258,7 @@ export async function createSession(req, res) {
         status: 'active',
         ended_at: null,
         occupied_seats: [],
+        assigned_crew_ids: Array.isArray(assigned_crew_ids) ? assigned_crew_ids : [],
         created_at: nowIso,
         updated_at: nowIso,
       })
@@ -414,7 +427,7 @@ export async function endSession(req, res) {
 export async function updateSession(req, res) {
   try {
     const { id } = req.params
-    const { flight_number, date, departure_time, route } = req.body ?? {}
+    const { flight_number, date, departure_time, route, assigned_crew_ids } = req.body ?? {}
 
     if (!id?.trim()) {
       return res.status(400).json({ error: 'session id is required' })
@@ -458,6 +471,9 @@ export async function updateSession(req, res) {
     }
     if (route !== undefined) {
       updateData.route = route?.trim() || null
+    }
+    if (assigned_crew_ids !== undefined) {
+      updateData.assigned_crew_ids = Array.isArray(assigned_crew_ids) ? assigned_crew_ids : []
     }
 
     if (flight_number !== undefined || date !== undefined) {
@@ -537,6 +553,46 @@ export async function deleteSession(req, res) {
   } catch (error) {
     console.error('deleteSession:', error)
     return res.status(500).json({ error: 'Failed to delete session' })
+  }
+}
+
+/**
+ * PUT /api/session/:id/assign-crew - Assign crew members to a session
+ */
+export async function assignCrewToSession(req, res) {
+  try {
+    const { id } = req.params
+    const { crew_ids } = req.body ?? {}
+
+    if (!id?.trim()) {
+      return res.status(400).json({ error: 'Session ID is required' })
+    }
+    if (!Array.isArray(crew_ids)) {
+      return res.status(400).json({ error: 'crew_ids must be an array' })
+    }
+
+    const sessionRef = adminDb.collection(COLLECTION).doc(id.trim())
+    const sessionSnap = await sessionRef.get()
+
+    if (!sessionSnap.exists) {
+      return res.status(404).json({ error: 'Session not found' })
+    }
+
+    const nowIso = new Date().toISOString()
+    await sessionRef.update({
+      assigned_crew_ids: crew_ids,
+      updated_at: nowIso,
+    })
+
+    const updated = await sessionRef.get()
+    return res.json({
+      success: true,
+      message: 'Crew assignment updated successfully',
+      session: safeSessionPayload(updated.id, updated.data()),
+    })
+  } catch (error) {
+    console.error('assignCrewToSession:', error)
+    return res.status(500).json({ error: 'Failed to assign crew to session' })
   }
 }
 

@@ -9,9 +9,9 @@ export default function RequireRole({ allowedRoles, children }) {
   const location = useLocation()
 
   if (loading) return null
-  if (!user) return <Navigate to="/admin/login" replace state={{ from: location.pathname }} />
+  if (!user) return <Navigate to="/admin-login" replace state={{ from: location.pathname }} />
   if (!allowedRoles.includes(role)) {
-    return <Navigate to="/admin/login" replace state={{ denied: true }} />
+    return <Navigate to="/admin-login" replace state={{ denied: true }} />
   }
   return children
 }

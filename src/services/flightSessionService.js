@@ -257,3 +257,23 @@ export async function updateSession(sessionId, updates, token) {
     return { ok: false, error: 'Network error' }
   }
 }
+
+export async function assignCrewToSession(sessionId, crewIds, token) {
+  try {
+    const response = await fetch(`${API_URL}/session/${encodeURIComponent(sessionId)}/assign-crew`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ crew_ids: crewIds }),
+    })
+    const data = await response.json()
+    if (!response.ok) {
+      return { ok: false, error: data.error || 'Failed to assign crew' }
+    }
+    return { ok: true, session: data.session }
+  } catch (e) {
+    return { ok: false, error: 'Network error' }
+  }
+}

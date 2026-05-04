@@ -5,10 +5,11 @@ import { useSession } from '../../context/useSession'
 import RequireFlightInstance from './RequireFlightInstance'
 import AdminDashboardPage from '../../pages/AdminDashboardPage'
 import AdminJoinSessionPage from '../../pages/AdminJoinSessionPage'
+import AdminSessionSelectionPage from '../../pages/AdminSessionSelectionPage'
 
 export default function AdminRouteHandler() {
   const { role } = useAuth()
-  const { sessionId } = useSession()
+  const { sessionId, activeSessionId } = useSession()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
 
@@ -16,8 +17,12 @@ export default function AdminRouteHandler() {
     setLoading(false)
   }, [])
 
-  // Admins get direct access, crew need session
+  // Admins need to select a session first
   if (role === 'admin') {
+    if (!activeSessionId) {
+      navigate('/admin/select-session')
+      return <div>Loading...</div>
+    }
     return <AdminDashboardPage />
   }
 

@@ -5,6 +5,7 @@
 import { Router } from 'express'
 import {
   getAllUsers,
+  getUsersByRole,
   createUser,
   updateUser,
   deleteUser,
@@ -30,6 +31,7 @@ const adminRoutes = Router()
 
 // User Management Routes (Admin only)
 adminRoutes.get('/admin/users', requireAuth, requireAdmin, getAllUsers)
+adminRoutes.get('/users', requireAuth, getUsersByRole)
 adminRoutes.post('/admin/users', requireAuth, requireAdmin, createUser)
 adminRoutes.put('/admin/users/:userId', requireAuth, requireAdmin, updateUser)
 adminRoutes.delete('/admin/users/:userId', requireAuth, requireAdmin, deleteUser)

@@ -31,7 +31,7 @@ export default function AdminDashboardPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { role, flightId } = useAuth()
-  const { sessionId: flightInstanceId, flightNumber } = useSession()
+  const { sessionId: flightInstanceId, flightNumber, activeSessionId } = useSession()
   const { showSuccess, showError } = useToast()
 
   const isAssignedToActiveFlight =
@@ -43,9 +43,16 @@ export default function AdminDashboardPage() {
     Boolean(flightInstanceId) &&
     flightIdsEqual(flightId, flightInstanceId)
 
+  const hasActiveSession = Boolean(activeSessionId)
+  const canManageSessions = role === 'admin' || hasActiveSession
+
   const [activeTab, setActiveTab] = useState('orders')
 
   // Validate URL parameters and redirect if accessing restricted tab
+  useEffect(() => {
+    document.title = 'IFMOD | Dashboard'
+  }, [])
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search)
     const tabParam = urlParams.get('tab')
@@ -332,7 +339,7 @@ export default function AdminDashboardPage() {
           />
         )}
 
-        {activeTab === 'sessions' && (isAdminForActiveFlight || role === 'admin') && <SessionsTab />}
+        {activeTab === 'sessions' && canManageSessions && <SessionsTab />}
 
         {activeTab === 'reports' && (isAdminForActiveFlight || role === 'admin') && (
           <ReportsTab orders={orders} summary={reportSummary} onRefresh={loadReport} />

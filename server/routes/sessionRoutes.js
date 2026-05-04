@@ -13,6 +13,7 @@ import {
   getSessionById,
   checkSeatAvailability,
   getSessionSummary,
+  assignCrewToSession,
 } from '../controllers/sessionController.js'
 import { requireAuth } from '../middleware/authz.js'
 
@@ -28,6 +29,7 @@ sessionRoutes.get('/session', requireAuth, getAllSessions)
 
 sessionRoutes.patch('/session/:id/end', requireAuth, endSession)
 sessionRoutes.put('/session/:id', requireAuth, updateSession)
+sessionRoutes.put('/session/:id/assign-crew', requireAuth, assignCrewToSession)
 sessionRoutes.delete('/session/:id', requireAuth, deleteSession)
 
 sessionRoutes.post('/session/:id/join-passenger', joinPassenger)

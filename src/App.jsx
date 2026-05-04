@@ -14,6 +14,7 @@ import MenuPage from './pages/MenuPage'
 import MenuCustomizePage from './pages/MenuCustomizePage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import AdminLoginPage from './pages/AdminLoginPage'
+import AdminSessionSelectionPage from './pages/AdminSessionSelectionPage'
 import AdminJoinSessionPage from './pages/AdminJoinSessionPage'
 import JoinPage from './pages/JoinPage'
 import ManualEntryPage from './pages/ManualEntryPage'
@@ -27,12 +28,20 @@ export default function App() {
             <Route path="/" element={<SessionEntryPage />} />
             <Route path="/join" element={<JoinPage />} />
             <Route path="/manual-entry" element={<ManualEntryPage />} />
-            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin-login" element={<AdminLoginPage />} />
             <Route
               path="/admin/join-session"
               element={
                 <RequireRole allowedRoles={['admin', 'crew']}>
                   <AdminJoinSessionPage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/admin/select-session"
+              element={
+                <RequireRole allowedRoles={['admin']}>
+                  <AdminSessionSelectionPage />
                 </RequireRole>
               }
             />

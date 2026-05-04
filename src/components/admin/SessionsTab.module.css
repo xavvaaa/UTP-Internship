@@ -204,6 +204,64 @@
   cursor: not-allowed;
 }
 
+/* Current Session Card */
+.currentSessionCard {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #3b82f6;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.currentSessionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.currentSessionHeader h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.currentSessionBadge {
+  padding: 0.25rem 0.75rem;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.currentSessionInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.currentSessionFlight {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e40af;
+}
+
+.currentSessionDetails {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: #3730a3;
+}
+
+.currentSessionDetails span {
+  padding: 0.125rem 0.5rem;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  font-weight: 500;
+}
+
 /* List Card */
 .listCard {
   background: white;
@@ -729,6 +787,15 @@
 
 .saveBtn:hover {
   background: #5568d3;
+}
+
+.switchBtn {
+  background-color: #059669 !important;
+  color: white !important;
+}
+
+.switchBtn:hover {
+  background-color: #047857 !important;
 }
 
 /* Status-specific card styles */

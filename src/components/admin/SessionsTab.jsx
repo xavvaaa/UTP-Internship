@@ -2,8 +2,9 @@
  * Sessions: create, list (summary), end, delete
  */
 import { useCallback, useEffect, useState } from 'react'
-import { Plus, CheckCircle, X, AlertTriangle, Trash2, Edit, Play, Square, CheckSquare2, ChevronUp, ChevronDown } from 'lucide-react'
+import { Plus, CheckCircle, X, AlertTriangle, Trash2, Edit, Play, Square, CheckSquare2, ChevronUp, ChevronDown, Users } from 'lucide-react'
 import { useToast } from '../../context/useToast'
+import { useSession } from '../../context/useSession'
 import { getAuthToken } from '../../utils/authToken'
 import {
   getSessionSummary,
@@ -14,11 +15,13 @@ import {
 } from '../../services/flightSessionService'
 import styles from './SessionsTab.module.css'
 import ConfirmDialog from '../common/ConfirmDialog'
+import CrewAssignmentModal from './CrewAssignmentModal'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 export default function SessionsTab() {
   const { showSuccess, showError } = useToast()
+  const { activeSessionId, setActiveSessionId } = useSession()
 
   const [activeList, setActiveList] = useState([])
   const [endedList, setEndedList] = useState([])
@@ -31,6 +34,7 @@ export default function SessionsTab() {
   const [statusFilter, setStatusFilter] = useState('all') // all, active, ended, expired
   const [isFormExpanded, setIsFormExpanded] = useState(true)
   const [isStatusGuideExpanded, setIsStatusGuideExpanded] = useState(true)
+  const [showCrewAssignment, setShowCrewAssignment] = useState(null)
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     message: '',
@@ -101,8 +105,8 @@ export default function SessionsTab() {
   }, [showError])
 
   useEffect(() => {
-    fetchAllSessions()
-  }, [fetchAllSessions])
+    fetchSummary()
+  }, [fetchSummary])
 
   async function handleCreateSession(e) {
     e.preventDefault()
@@ -223,14 +227,26 @@ export default function SessionsTab() {
     }
   }
 
-  function toggleSessionSelection(sessionId) {
-    const newSelected = new Set(selectedSessions)
-    if (newSelected.has(sessionId)) {
-      newSelected.delete(sessionId)
-    } else {
-      newSelected.add(sessionId)
-    }
-    setSelectedSessions(newSelected)
+  function handleCrewAssignment(session) {
+    setShowCrewAssignment(session)
+  }
+
+  function handleCrewAssignmentComplete(updatedSession) {
+    // Update the session in the lists
+    setActiveList(prev => prev.map(s => s.id === updatedSession.id ? updatedSession : s))
+    setEndedList(prev => prev.map(s => s.id === updatedSession.id ? updatedSession : s))
+    setShowCrewAssignment(null)
+  }
+
+  function handleSwitchSession(sessionId) {
+    setActiveSessionId(sessionId)
+    showSuccess('Switched to selected session')
+  }
+
+  function getCurrentSessionInfo() {
+    if (!activeSessionId) return null
+    const allSessions = [...activeList, ...endedList]
+    return allSessions.find(s => s.id === activeSessionId)
   }
 
   async function handleBulkDelete() {
@@ -474,6 +490,32 @@ export default function SessionsTab() {
           </div>
         </div>
 
+        {/* Current Session Display */}
+        {getCurrentSessionInfo() && (
+          <div className={styles.currentSessionCard}>
+            <div className={styles.currentSessionHeader}>
+              <h4>Currently Managing</h4>
+              <div className={styles.currentSessionBadge}>
+                Active Session
+              </div>
+            </div>
+            <div className={styles.currentSessionInfo}>
+              <div className={styles.currentSessionFlight}>
+                {getCurrentSessionInfo().flight_number}
+              </div>
+              <div className={styles.currentSessionDetails}>
+                <span>{getCurrentSessionInfo().date}</span>
+                {getCurrentSessionInfo().departure_time && (
+                  <span>{getCurrentSessionInfo().departure_time}</span>
+                )}
+                {getCurrentSessionInfo().route && (
+                  <span>{getCurrentSessionInfo().route}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className={styles.instructionCard}>
           <div className={styles.instructionHeader}>
             <h4 className={styles.instructionTitle}>Session Status Guide</h4>
@@ -537,7 +579,7 @@ export default function SessionsTab() {
             {displaySessions.map((session) => (
               <div
                 key={session.id}
-                className={`${styles.sessionCard} ${styles[session.status === 'active' ? 'active' : 'closed']} ${showDetails?.id === session.id ? styles.selected : ''} ${showMultiSelect ? styles.multiSelectMode : ''}`}
+                className={`${styles.sessionCard} ${styles[session.status === 'active' ? 'active' : 'closed']} ${showDetails?.id === session.id ? styles.selected : ''} ${showMultiSelect ? styles.multiSelectMode : ''} ${activeSessionId === session.id ? styles.activeSession : ''}`}
                 onClick={() => !showMultiSelect && handleSessionClick(session)}
                 style={{ cursor: showMultiSelect ? 'default' : 'pointer' }}
               >
@@ -592,6 +634,30 @@ export default function SessionsTab() {
                   >
                     <Edit size={14} />
                   </button>
+                  <button
+                    type="button"
+                    className={styles.actionBtn}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleCrewAssignment(session)
+                    }}
+                    title="Assign Crew"
+                  >
+                    <Users size={14} />
+                  </button>
+                  {activeSessionId !== session.id && (
+                    <button
+                      type="button"
+                      className={`${styles.actionBtn} ${styles.switchBtn}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleSwitchSession(session.id)
+                      }}
+                      title="Switch to this Session"
+                    >
+                      <CheckCircle size={14} />
+                    </button>
+                  )}
                   {session.status === 'active' ? (
                     <button
                       type="button"
@@ -815,6 +881,14 @@ export default function SessionsTab() {
           </div>
         </div>
       )}
+
+      {/* Crew Assignment Modal */}
+      <CrewAssignmentModal
+        session={showCrewAssignment}
+        isOpen={!!showCrewAssignment}
+        onClose={() => setShowCrewAssignment(null)}
+        onAssignmentComplete={handleCrewAssignmentComplete}
+      />
 
       {/* Custom Confirmation Dialog */}
       <ConfirmDialog

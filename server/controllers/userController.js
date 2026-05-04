@@ -27,6 +27,35 @@ export async function getAllUsers(req, res) {
 }
 
 /**
+ * GET /api/users
+ * Get users filtered by role (optional)
+ */
+export async function getUsersByRole(req, res) {
+  try {
+    const { role } = req.query
+    
+    let query = adminDb.collection('users')
+    if (role && ['admin', 'crew'].includes(role)) {
+      query = query.where('role', '==', role)
+    }
+    
+    const snapshot = await query.get()
+    const users = snapshot.docs.map((doc) =>({
+      id: doc.id,
+      ...doc.data(),
+    }))
+
+    res.json({
+      success: true,
+      users,
+    })
+  } catch (error) {
+    console.error('Error fetching users by role:', error)
+    res.status(500).json({ error: 'Failed to fetch users' })
+  }
+}
+
+/**
  * POST /api/admin/users
  * Create a new user
  */
