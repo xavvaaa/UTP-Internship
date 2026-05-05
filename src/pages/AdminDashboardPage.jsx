@@ -25,6 +25,7 @@ import {
   updateMenuMeal,
 } from '../services/admin/menuAdminService'
 import { uploadMenuItemImage } from '../services/storageService'
+import { getDefaultRoute } from '../utils/roleBasedRoutes'
 import styles from './AdminDashboardPage.module.css'
 
 export default function AdminDashboardPage() {
@@ -64,7 +65,9 @@ export default function AdminDashboardPage() {
       const defaultTab = role === 'admin' ? 'orders' : (isAssignedToActiveFlight ? 'orders' : null)
       if (defaultTab) {
         setActiveTab(defaultTab)
-        navigate(`/admin?tab=${defaultTab}`, { replace: true })
+        // Use role-based routing instead of hardcoded /admin
+        const defaultRoute = getDefaultRoute(role)
+        navigate(`${defaultRoute}?tab=${defaultTab}`)
       }
     }
   }, [location.search, role, isAssignedToActiveFlight, navigate])
@@ -73,8 +76,9 @@ export default function AdminDashboardPage() {
   const handleTabChange = (tabId) => {
     if (tabAllowed(tabId)) {
       setActiveTab(tabId)
-      // Update URL parameter when tab changes
-      navigate(`/admin?tab=${tabId}`, { replace: true })
+      // Update URL parameter when tab changes - use role-based routing
+      const defaultRoute = getDefaultRoute(role)
+      navigate(`${defaultRoute}?tab=${tabId}`)
     }
   }
 

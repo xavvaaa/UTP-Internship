@@ -3,11 +3,12 @@
  */
 import { useId, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, AlertCircle, Plane, Key, ArrowRight, Coffee, Utensils, Clock } from 'lucide-react'
+import { Loader2, AlertCircle, Plane, Key, ArrowRight, Coffee, Utensils, Clock, QrCode } from 'lucide-react'
 import { useSession } from '../../context/useSession'
 import { joinPassengerSession, resolveSessionByCode } from '../../services/flightSessionService'
 import { isValidSeatFormat } from '../../utils/seatFormat'
 import FlightHeader from '../layout/FlightHeader'
+import QRScanner from '../qr/QRScanner'
 import styles from './SessionEntryForm.module.css'
 
 export default function SessionEntryForm() {
@@ -20,10 +21,49 @@ export default function SessionEntryForm() {
   const [seatInput, setSeatInput] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showQRScanner, setShowQRScanner] = useState(false)
 
   useEffect(() => {
     document.title = 'IFMOD | Passenger Login'
   }, [])
+
+  const handleQRScanSuccess = async (qrData) => {
+    try {
+      // Validate the QR data with backend
+      const resolved = await resolveSessionByCode(qrData.access_code)
+      if (!resolved.ok) {
+        setError(resolved.error || 'Invalid QR code.')
+        return
+      }
+
+      // Auto-fill the access code
+      setAccessCode(qrData.access_code)
+      setShowQRScanner(false)
+      setError('')
+      
+      // Focus on seat input for better UX
+      const seatInput = document.getElementById(seatId)
+      if (seatInput) {
+        seatInput.focus()
+      }
+    } catch (err) {
+      console.error('QR validation error:', err)
+      setError('Failed to validate QR code.')
+    }
+  }
+
+  const handleQRScanError = (error) => {
+    setError(error || 'QR scan failed. Please try again.')
+  }
+
+  const openQRScanner = () => {
+    setShowQRScanner(true)
+    setError('')
+  }
+
+  const closeQRScanner = () => {
+    setShowQRScanner(false)
+  }
 
   async function onSubmit(e) {
     e.preventDefault()
@@ -67,7 +107,7 @@ export default function SessionEntryForm() {
         role: 'passenger',
       })
       if (ok) {
-        navigate('/menu', { replace: true })
+        navigate('/menu')
       }
     } catch (err) {
       console.error(err)
@@ -130,28 +170,51 @@ export default function SessionEntryForm() {
       
       <div className={styles.rightPanel}>
         <div className={styles.loginCard}>
-          <div className={styles.lockBadge}>
-            <Plane size={32} />
+          <div className={styles.qrBadge}>
+            <QrCode size={32} />
           </div>
           
-          <h2 className={styles.loginTitle}>Passenger Login</h2>
-          <p className={styles.loginSubtitle}>Enter your flight access code and seat number</p>
+          <h2 className={styles.loginTitle}>Access Your In-Flight Menu</h2>
+          <p className={styles.loginSubtitle}>Scan QR or enter details</p>
           
-          <form className={styles.form} onSubmit={onSubmit} noValidate>
-            {sessionError ? (
-              <p className={styles.alert} role="alert">
-                <AlertCircle size={16} aria-hidden />
-                {sessionError}
-              </p>
-            ) : null}
+          {sessionError ? (
+            <p className={styles.alert} role="alert">
+              <AlertCircle size={16} aria-hidden />
+              {sessionError}
+            </p>
+          ) : null}
 
-            {error ? (
-              <p className={styles.alert} role="alert">
-                <AlertCircle size={16} aria-hidden />
-                {error}
-              </p>
-            ) : null}
-            
+          {error ? (
+            <p className={styles.alert} role="alert">
+              <AlertCircle size={16} aria-hidden />
+              {error}
+            </p>
+          ) : null}
+          
+          {/* Large QR Scanner Section */}
+          <button 
+            className={styles.qrScannerSection}
+            onClick={openQRScanner}
+            disabled={loading || sessionLoading}
+          >
+            <div className={styles.qrScannerIcon}>
+              <QrCode size={40} />
+            </div>
+            <div className={styles.qrScannerContent}>
+              <h3>Scan QR Code</h3>
+              <p>Use your camera to scan the in-flight QR code</p>
+            </div>
+          </button>
+          
+          {/* OR Divider */}
+          <div className={styles.orDivider}>
+            <div className={styles.orLine}></div>
+            <span className={styles.orText}>OR</span>
+            <div className={styles.orLine}></div>
+          </div>
+          
+          {/* Manual Input Section */}
+          <form className={styles.form} onSubmit={onSubmit} noValidate>
             <label className={styles.label}>
               Access code
               <div className={styles.inputWrapper}>
@@ -162,7 +225,7 @@ export default function SessionEntryForm() {
                   autoComplete="off"
                   autoCapitalize="characters"
                   spellCheck={false}
-                  placeholder="From crew"
+                  placeholder="Enter access code"
                   value={accessCode}
                   onChange={(ev) => setAccessCode(ev.target.value.toUpperCase())}
                   disabled={loading || sessionLoading}
@@ -175,6 +238,7 @@ export default function SessionEntryForm() {
               <div className={styles.inputWrapper}>
                 <Plane className={styles.inputIcon} size={20} />
                 <input
+                  id={seatId}
                   className={styles.input}
                   type="text"
                   inputMode="text"
@@ -198,7 +262,7 @@ export default function SessionEntryForm() {
                 </>
               ) : (
                 <>
-                  Continue to menu
+                  Continue to Menu
                   <ArrowRight size={16} />
                 </>
               )}
@@ -206,6 +270,14 @@ export default function SessionEntryForm() {
           </form>
         </div>
       </div>
+      
+      {showQRScanner && (
+        <QRScanner
+          onScanSuccess={handleQRScanSuccess}
+          onScanError={handleQRScanError}
+          onClose={closeQRScanner}
+        />
+      )}
     </div>
   )
 }

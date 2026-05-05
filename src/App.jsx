@@ -9,11 +9,13 @@ import RequireSession from './components/routing/RequireSession'
 import RequireRole from './components/routing/RequireRole'
 import RequireFlightInstance from './components/routing/RequireFlightInstance'
 import AdminRouteHandler from './components/routing/AdminRouteHandler'
+import RootRedirect from './components/routing/RootRedirect'
 import SessionEntryPage from './pages/SessionEntryPage'
 import MenuPage from './pages/MenuPage'
 import MenuCustomizePage from './pages/MenuCustomizePage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import AdminLoginPage from './pages/AdminLoginPage'
+import CabinCrewLoginPage from './pages/CabinCrewLoginPage'
 import AdminSessionSelectionPage from './pages/AdminSessionSelectionPage'
 import AdminJoinSessionPage from './pages/AdminJoinSessionPage'
 import JoinPage from './pages/JoinPage'
@@ -25,14 +27,23 @@ export default function App() {
       <SessionProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<SessionEntryPage />} />
+            <Route path="/" element={<><RootRedirect /><SessionEntryPage /></>} />
             <Route path="/join" element={<JoinPage />} />
             <Route path="/manual-entry" element={<ManualEntryPage />} />
             <Route path="/admin-login" element={<AdminLoginPage />} />
+            <Route path="/cabin-crew-login" element={<CabinCrewLoginPage />} />
             <Route
-              path="/cabin-crew-login"
+              path="/crew/session-join"
               element={
-                <RequireRole allowedRoles={['admin', 'crew']}>
+                <RequireRole allowedRoles={['crew']}>
+                  <AdminJoinSessionPage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/cabin-crew-join"
+              element={
+                <RequireRole allowedRoles={['crew']}>
                   <AdminJoinSessionPage />
                 </RequireRole>
               }
@@ -48,8 +59,16 @@ export default function App() {
             <Route
               path="/admin"
               element={
-                <RequireRole allowedRoles={['admin', 'crew']}>
+                <RequireRole allowedRoles={['admin']}>
                   <AdminRouteHandler />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/crew/dashboard"
+              element={
+                <RequireRole allowedRoles={['crew']}>
+                  <AdminDashboardPage />
                 </RequireRole>
               }
             />

@@ -93,17 +93,17 @@ export default function MenuCustomizePage() {
     if (!firebaseConfigured) return
     if (menuLoading) return
     if (!mealId) {
-      navigate('/menu', { replace: true })
+      navigate('/menu')
       return
     }
     if (!menuItems.length) {
-      navigate('/menu', { replace: true })
+      navigate('/menu')
       return
     }
     const found = menuItems.some(
       (m) => m.id === mealId && String(m.category).toLowerCase() === 'meal',
     )
-    if (!found) navigate('/menu', { replace: true })
+    if (!found) navigate('/menu')
   }, [mealId, menuItems, menuLoading, navigate])
 
   const drinkMeta = useMemo(() => menuItems.find((m) => m.id === drinkChoice), [menuItems, drinkChoice])
@@ -121,7 +121,7 @@ export default function MenuCustomizePage() {
 
   function handleLeave() {
     clearSession()
-    navigate('/', { replace: true })
+    navigate('/')
   }
 
   async function handlePlaceOrder() {
@@ -141,7 +141,7 @@ export default function MenuCustomizePage() {
         dessertName: readChoiceName(dessertChoice, dessertMeta),
         snackName: readChoiceName(snackChoice, snackMeta),
       })
-      navigate('/menu', { replace: true })
+      navigate('/menu')
     } catch (e) {
       setOrderError(e?.message ?? 'Order failed.')
     } finally {

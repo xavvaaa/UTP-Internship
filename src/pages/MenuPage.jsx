@@ -39,7 +39,7 @@ export default function MenuPage() {
 
   function handleLeave() {
     clearSession()
-    navigate('/', { replace: true })
+    navigate('/')
   }
 
   function openCustomize(mealId) {

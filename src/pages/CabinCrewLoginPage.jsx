@@ -1,14 +1,15 @@
 /**
- * Admin (Purser) login page for admin dashboard access.
+ * Cabin Crew login page for crew dashboard access.
  */
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Loader2, AlertCircle, Eye, EyeOff, Mail, Lock, ArrowRight, ListTodo, Users, BarChart3 } from 'lucide-react'
+import { Loader2, ShieldCheck, AlertCircle, Eye, EyeOff, Mail, Lock, ArrowRight, ListTodo, Users, BarChart3 } from 'lucide-react'
 import { useAuth } from '../context/useAuth'
+import { getDefaultRoute } from '../utils/roleBasedRoutes'
 import styles from './AdminLoginPage.module.css'
 
-export default function AdminLoginPage() {
-  const { signIn, role } = useAuth()
+export default function CabinCrewLoginPage() {
+  const { signIn, role, user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [email, setEmail] = useState('')
@@ -19,11 +20,12 @@ export default function AdminLoginPage() {
   const [rememberMe, setRememberMe] = useState(false)
 
   const denied = Boolean(location.state?.denied)
-  const from = location.state?.from || '/admin/select-session'
+  const from = location.state?.from || getDefaultRoute(role) || '/crew/session-join'
+  const isCabinCrewRoute = location.pathname === '/cabin-crew-login'
 
   useEffect(() => {
-    document.title = 'IFMOD | Admin Login'
-  }, [])
+    document.title = 'IFMOD | Cabin Crew Login'
+  }, [isCabinCrewRoute])
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -33,22 +35,19 @@ export default function AdminLoginPage() {
       await signIn(email, password)
       // Simple timeout to allow role to be set
       setTimeout(() => {
-        console.log('AdminLoginPage - Role check:', role, 'from:', from)
         // Check if role is properly set
         if (!role) {
-          console.log('AdminLoginPage - No role set, showing error')
-          setError('Your account does not have admin permissions. Please contact an administrator.')
+          setError('Your account does not have cabin crew permissions. Please contact an administrator to set up your account.')
           setLoading(false)
           return
         }
         
-        // Redirect based on role
-        if (role === 'admin') {
-          console.log('AdminLoginPage - Admin role, navigating to:', from)
-          navigate(from)
+        // Use role-based routing for redirects
+        const defaultRoute = getDefaultRoute(role)
+        if (defaultRoute) {
+          navigate(defaultRoute)
         } else {
-          console.log('AdminLoginPage - Non-admin role, showing error for role:', role)
-          setError(`This login is for administrators only. Your account has role: ${role}. Please use the appropriate login page.`)
+          setError(`Your account has an unrecognized role: ${role}. Please contact an administrator.`)
           setLoading(false)
         }
       }, 500)
@@ -64,7 +63,7 @@ export default function AdminLoginPage() {
         <div className={styles.leftContent}>
           <div className={styles.logoContainer}>
             <div className={styles.logoSquare}>
-              <Lock size={24} />
+              <ShieldCheck size={24} />
             </div>
             <div className={styles.logoText}>IFMOD</div>
           </div>
@@ -112,17 +111,17 @@ export default function AdminLoginPage() {
       <div className={styles.rightPanel}>
         <div className={styles.loginCard}>
           <div className={styles.lockBadge}>
-            <Lock size={32} />
+            <ShieldCheck size={32} />
           </div>
           
-          <h2 className={styles.loginTitle}>Admin (Purser) Login</h2>
-          <p className={styles.loginSubtitle}>Sign in to your account to continue</p>
+          <h2 className={styles.loginTitle}>Cabin Crew Login</h2>
+          <p className={styles.loginSubtitle}>Sign in to access the crew dashboard</p>
           
           <form className={styles.form} onSubmit={handleSubmit}>
             {denied ? (
               <p className={styles.alert} role="alert">
                 <AlertCircle size={16} aria-hidden />
-                You do not have permission to access the admin dashboard.
+                You do not have permission to access the crew dashboard.
               </p>
             ) : null}
             {error ? (
@@ -142,7 +141,7 @@ export default function AdminLoginPage() {
                   autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your admin email"
+                  placeholder="Enter your crew email"
                   required
                 />
               </div>

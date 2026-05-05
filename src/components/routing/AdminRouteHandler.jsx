@@ -8,14 +8,24 @@ import AdminJoinSessionPage from '../../pages/AdminJoinSessionPage'
 import AdminSessionSelectionPage from '../../pages/AdminSessionSelectionPage'
 
 export default function AdminRouteHandler() {
-  const { role } = useAuth()
-  const { sessionId, activeSessionId } = useSession()
+  const { role, loading: authLoading } = useAuth()
+  const { sessionId, activeSessionId, loading: sessionLoading } = useSession()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setLoading(false)
   }, [])
+
+  // Block ALL redirects while auth state is loading
+  if (authLoading) {
+    return <div>Loading...</div>
+  }
+  
+  // Block redirects if role is undefined (loading state)
+  if (!role) {
+    return <div>Loading...</div>
+  }
 
   // Admins need to select a session first
   if (role === 'admin') {
@@ -26,17 +36,10 @@ export default function AdminRouteHandler() {
     return <AdminDashboardPage />
   }
 
-  // Crew need to join a session first
+  // Crew should never access admin routes - redirect to crew session join
   if (role === 'crew') {
-    if (sessionId) {
-      return (
-        <RequireFlightInstance>
-          <AdminDashboardPage />
-        </RequireFlightInstance>
-      )
-    } else {
-      return <AdminJoinSessionPage />
-    }
+    navigate('/crew/session-join')
+    return <div>Redirecting to crew dashboard...</div>
   }
 
   // Fallback - should not reach here due to RequireRole

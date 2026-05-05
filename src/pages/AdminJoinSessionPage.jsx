@@ -8,6 +8,7 @@ import PageShell from '../components/layout/PageShell'
 import { useAuth } from '../context/useAuth'
 import { useSession } from '../context/useSession'
 import { resolveSessionByCode } from '../services/flightSessionService'
+import { getDefaultRoute } from '../utils/roleBasedRoutes'
 import styles from './AdminLoginPage.module.css'
 
 export default function AdminJoinSessionPage() {
@@ -39,13 +40,21 @@ export default function AdminJoinSessionPage() {
       }
 
       const sessionRole = role === 'admin' ? 'admin' : 'crew'
+      
       const ok = await setSession({
         sessionId: result.flight_instance_id,
         sessionInfo: result.session,
         role: sessionRole,
       })
+      
       if (ok) {
-        navigate('/admin', { replace: true })
+        // Use role-based routing for redirects
+        const defaultRoute = getDefaultRoute(role)
+        if (role === 'crew') {
+          navigate('/crew/dashboard')
+        } else {
+          navigate(defaultRoute)
+        }
       }
     } catch (err) {
       setError(err?.message || 'Something went wrong.')
