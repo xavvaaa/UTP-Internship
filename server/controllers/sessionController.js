@@ -32,6 +32,66 @@ function normalizeSeat(seat) {
     .toUpperCase()
 }
 
+function parseFlightNumber(value) {
+  const normalized = String(value ?? '').trim().toUpperCase().replace(/\s+/g, '')
+  const match = normalized.match(/^([A-Z]{2,3})(\d+[A-Z]?)$/)
+  if (!match) return { flightIata: normalized, airlineIata: '', number: normalized }
+  return { flightIata: normalized, airlineIata: match[1], number: match[2] }
+}
+
+function readRouteFromItem(item) {
+  const dep =
+    item?.departure?.iata ||
+    item?.departure?.iataCode ||
+    item?.dep_iata ||
+    item?.departure_iata
+  const arr =
+    item?.arrival?.iata ||
+    item?.arrival?.iataCode ||
+    item?.arr_iata ||
+    item?.arrival_iata
+
+  if (!dep || !arr) return null
+  const departure = String(dep).toUpperCase()
+  const arrival = String(arr).toUpperCase()
+  const scheduled = item?.departure?.scheduled || item?.departure?.scheduledTime || ''
+  const flightDate = item?.flight_date || ''
+  const departureTime = scheduled ? String(scheduled).slice(11, 16) : ''
+  return { route: `${departure}-${arrival}`, departure, arrival, departure_time: departureTime, flight_date: flightDate }
+}
+
+async function fetchAviationstack(path, params) {
+  const key = process.env.AVIATIONSTACK_API_KEY
+  if (!key) {
+    const error = new Error('Aviationstack API key is not configured')
+    error.status = 501
+    throw error
+  }
+
+  const url = new URL(`https://api.aviationstack.com/v1/${path}`)
+  url.searchParams.set('access_key', key)
+  Object.entries(params).forEach(([paramKey, paramValue]) => {
+    if (paramValue) url.searchParams.set(paramKey, paramValue)
+  })
+
+  const response = await fetch(url)
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok || data?.error) {
+    const error = new Error(data?.error?.message || 'Aviationstack lookup failed')
+    error.status = response.status || 502
+    throw error
+  }
+
+  return Array.isArray(data?.data) ? data.data : []
+}
+
+function isPlanUnsupported(error) {
+  return (
+    error?.status === 403 &&
+    String(error?.message || '').toLowerCase().includes('subscription plan')
+  )
+}
+
 /** Validation order: 404 → 410 → 403 (no DB writes). Returns { ok } or { status, error } */
 function validateSessionSnapshot(snap) {
   if (!snap.exists) return { status: 404, error: 'Session not found' }
@@ -135,6 +195,46 @@ export async function resolveSession(req, res) {
   } catch (error) {
     console.error('resolveSession:', error)
     return res.status(500).json({ error: 'Failed to resolve session' })
+  }
+}
+
+/**
+ * GET /api/session/route-lookup?flight_number=MH123&date=YYYY-MM-DD
+ */
+export async function lookupFlightRoute(req, res) {
+  try {
+    const flightNumber = String(req.query.flight_number ?? '').trim().toUpperCase()
+    const date = String(req.query.date ?? '').trim()
+
+    if (!flightNumber) {
+      return res.status(400).json({ error: 'flight_number is required' })
+    }
+    if (!date) {
+      return res.status(400).json({ error: 'date is required' })
+    }
+
+    const parsed = parseFlightNumber(flightNumber)
+    try {
+      const flightResults = await fetchAviationstack('flights', {
+        flight_iata: parsed.flightIata,
+        flight_num: parsed.number,
+        limit: '1',
+      })
+      const flightRoute = flightResults.map(readRouteFromItem).find(Boolean)
+      if (flightRoute) {
+        return res.json({ ok: true, source: 'flights', ...flightRoute })
+      }
+    } catch (error) {
+      if (!isPlanUnsupported(error)) throw error
+      return res.status(403).json({
+        error: 'Your Aviationstack subscription does not support real-time flight lookup. Enter the route manually or upgrade the API plan.',
+      })
+    }
+
+    return res.status(404).json({ error: 'No active real-time flight found. Enter the route manually.' })
+  } catch (error) {
+    console.error('lookupFlightRoute:', error)
+    return res.status(error.status || 500).json({ error: error.message || 'Failed to look up route' })
   }
 }
 

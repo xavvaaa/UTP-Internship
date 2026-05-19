@@ -1,56 +1,83 @@
 /**
  * Cabin Crew login page for crew dashboard access.
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Loader2, ShieldCheck, AlertCircle, Eye, EyeOff, Mail, Lock, ArrowRight, ListTodo, Users, BarChart3 } from 'lucide-react'
 import { useAuth } from '../context/useAuth'
 import { getDefaultRoute } from '../utils/roleBasedRoutes'
 import styles from './AdminLoginPage.module.css'
 
+const REMEMBER_CREW_KEY = 'ifmod_remember_crew_login'
+const CREW_EMAIL_KEY = 'ifmod_crew_email'
+
+function readStoredValue(key) {
+  try {
+    return localStorage.getItem(key) || ''
+  } catch {
+    return ''
+  }
+}
+
 export default function CabinCrewLoginPage() {
-  const { signIn, role, user } = useAuth()
+  const { signIn, user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [email, setEmail] = useState('')
+  const clearedForwardRef = useRef(false)
+  const [email, setEmail] = useState(() => readStoredValue(CREW_EMAIL_KEY))
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
+  const [rememberMe, setRememberMe] = useState(() => readStoredValue(REMEMBER_CREW_KEY) === 'true')
 
   const denied = Boolean(location.state?.denied)
-  const from = location.state?.from || getDefaultRoute(role) || '/crew/session-join'
   const isCabinCrewRoute = location.pathname === '/cabin-crew-login'
 
   useEffect(() => {
     document.title = 'IFMOD | Cabin Crew Login'
   }, [isCabinCrewRoute])
 
+  useEffect(() => {
+    if (authLoading || !user || clearedForwardRef.current) return
+    window.history.pushState(window.history.state, '', window.location.href)
+    clearedForwardRef.current = true
+  }, [authLoading, user])
+
+  useEffect(() => {
+    try {
+      if (rememberMe) {
+        localStorage.setItem(REMEMBER_CREW_KEY, 'true')
+        localStorage.setItem(CREW_EMAIL_KEY, email)
+      } else {
+        localStorage.removeItem(REMEMBER_CREW_KEY)
+        localStorage.removeItem(CREW_EMAIL_KEY)
+      }
+    } catch {
+      /* ignore storage errors */
+    }
+  }, [email, rememberMe])
+
   async function handleSubmit(event) {
     event.preventDefault()
     setError('')
     setLoading(true)
     try {
-      await signIn(email, password)
-      // Simple timeout to allow role to be set
-      setTimeout(() => {
-        // Check if role is properly set
-        if (!role) {
-          setError('Your account does not have cabin crew permissions. Please contact an administrator to set up your account.')
-          setLoading(false)
-          return
-        }
-        
-        // Use role-based routing for redirects
-        const defaultRoute = getDefaultRoute(role)
-        if (defaultRoute) {
-          navigate(defaultRoute)
-        } else {
-          setError(`Your account has an unrecognized role: ${role}. Please contact an administrator.`)
-          setLoading(false)
-        }
-      }, 500)
+      const { role: signedInRole } = await signIn(email, password, { rememberMe })
+      if (!signedInRole) {
+        setError('Your account does not have cabin crew permissions. Please contact an administrator to set up your account.')
+        setLoading(false)
+        return
+      }
+      
+      // Use role-based routing for redirects
+      const defaultRoute = getDefaultRoute(signedInRole)
+      if (defaultRoute) {
+        navigate(defaultRoute)
+      } else {
+        setError(`Your account has an unrecognized role: ${signedInRole}. Please contact an administrator.`)
+        setLoading(false)
+      }
     } catch (err) {
       setError(err?.message || 'Could not sign in.')
       setLoading(false)
@@ -138,6 +165,7 @@ export default function CabinCrewLoginPage() {
                 <input
                   className={styles.input}
                   type="email"
+                  name="email"
                   autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -154,6 +182,7 @@ export default function CabinCrewLoginPage() {
                 <input
                   className={styles.input}
                   type={showPassword ? "text" : "password"}
+                  name="password"
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

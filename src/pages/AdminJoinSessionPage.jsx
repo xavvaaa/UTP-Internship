@@ -51,9 +51,9 @@ export default function AdminJoinSessionPage() {
         // Use role-based routing for redirects
         const defaultRoute = getDefaultRoute(role)
         if (role === 'crew') {
-          navigate('/crew/dashboard')
+          navigate('/crew/dashboard', { replace: true })
         } else {
-          navigate(defaultRoute)
+          navigate(defaultRoute, { replace: true })
         }
       }
     } catch (err) {

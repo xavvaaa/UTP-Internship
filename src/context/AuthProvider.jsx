@@ -3,7 +3,14 @@
  * Flight assignment uses SessionProvider flightInstanceId (crew joins via access_code).
  */
 import { useEffect, useMemo, useState, useCallback } from 'react'
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import {
+  browserLocalPersistence,
+  browserSessionPersistence,
+  onAuthStateChanged,
+  setPersistence,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth'
 import { auth } from '../firebase/config'
 import { AuthContext } from './authContext'
 
@@ -17,7 +24,7 @@ export function AuthProvider({ children }) {
     if (!currentUser) {
       setRole(null)
       setFlightId(null)
-      return
+      return { role: null, flightId: null }
     }
     try {
       const tokenResult = await currentUser.getIdTokenResult(true)
@@ -25,11 +32,13 @@ export function AuthProvider({ children }) {
       const claimFlightId = String(tokenResult?.claims?.flightId ?? '').trim()
       setRole(claimRole || null)
       setFlightId(claimFlightId || null)
+      return { role: claimRole || null, flightId: claimFlightId || null }
     } catch (error) {
       console.warn('Failed to refresh auth claims (network or certificate issue):', error.message)
       // Set fallback values to prevent app crashes
       setRole(null)
       setFlightId(null)
+      return { role: null, flightId: null }
     }
   }, [])
 
@@ -49,11 +58,13 @@ export function AuthProvider({ children }) {
   }, [refreshClaims])
 
   const signIn = useCallback(
-    async (email, password) => {
+    async (email, password, options = {}) => {
       if (!auth) throw new Error('Firebase Auth is not configured.')
+      const persistence = options.rememberMe ? browserLocalPersistence : browserSessionPersistence
+      await setPersistence(auth, persistence)
       const cred = await signInWithEmailAndPassword(auth, email, password)
-      await refreshClaims(cred.user)
-      return cred.user
+      const claims = await refreshClaims(cred.user)
+      return { user: cred.user, ...claims }
     },
     [refreshClaims],
   )

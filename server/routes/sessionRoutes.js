@@ -14,6 +14,7 @@ import {
   checkSeatAvailability,
   getSessionSummary,
   assignCrewToSession,
+  lookupFlightRoute,
 } from '../controllers/sessionController.js'
 import { requireAuth } from '../middleware/authz.js'
 
@@ -23,6 +24,7 @@ const sessionRoutes = Router()
 sessionRoutes.post('/session/resolve', resolveSession)
 
 sessionRoutes.get('/session/summary', requireAuth, getSessionSummary)
+sessionRoutes.get('/session/route-lookup', requireAuth, lookupFlightRoute)
 
 sessionRoutes.post('/session', requireAuth, createSession)
 sessionRoutes.get('/session', requireAuth, getAllSessions)

@@ -167,6 +167,33 @@ export async function createSession(sessionData, token) {
   }
 }
 
+export async function lookupFlightRoute(flightNumber, date, token) {
+  try {
+    const params = new URLSearchParams({
+      flight_number: String(flightNumber ?? '').trim().toUpperCase(),
+      date: String(date ?? '').trim(),
+    })
+    const response = await fetch(`${API_URL}/session/route-lookup?${params.toString()}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      return { ok: false, error: data.error || 'Failed to look up route' }
+    }
+    return {
+      ok: true,
+      route: data.route,
+      departure: data.departure,
+      arrival: data.arrival,
+      departure_time: data.departure_time,
+      flight_date: data.flight_date,
+      source: data.source,
+    }
+  } catch {
+    return { ok: false, error: 'Network error' }
+  }
+}
+
 /**
  * Get session by id (validates; 404/410/403)
  */

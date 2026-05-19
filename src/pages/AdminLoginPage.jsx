@@ -1,22 +1,34 @@
 /**
  * Admin (Purser) login page for admin dashboard access.
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Loader2, AlertCircle, Eye, EyeOff, Mail, Lock, ArrowRight, ListTodo, Users, BarChart3 } from 'lucide-react'
 import { useAuth } from '../context/useAuth'
 import styles from './AdminLoginPage.module.css'
 
+const REMEMBER_ADMIN_KEY = 'ifmod_remember_admin_login'
+const ADMIN_EMAIL_KEY = 'ifmod_admin_email'
+
+function readStoredValue(key) {
+  try {
+    return localStorage.getItem(key) || ''
+  } catch {
+    return ''
+  }
+}
+
 export default function AdminLoginPage() {
-  const { signIn, role } = useAuth()
+  const { signIn, user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [email, setEmail] = useState('')
+  const clearedForwardRef = useRef(false)
+  const [email, setEmail] = useState(() => readStoredValue(ADMIN_EMAIL_KEY))
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
+  const [rememberMe, setRememberMe] = useState(() => readStoredValue(REMEMBER_ADMIN_KEY) === 'true')
 
   const denied = Boolean(location.state?.denied)
   const from = location.state?.from || '/admin/select-session'
@@ -25,33 +37,45 @@ export default function AdminLoginPage() {
     document.title = 'IFMOD | Admin Login'
   }, [])
 
+  useEffect(() => {
+    if (authLoading || !user || clearedForwardRef.current) return
+    window.history.pushState(window.history.state, '', window.location.href)
+    clearedForwardRef.current = true
+  }, [authLoading, user])
+
+  useEffect(() => {
+    try {
+      if (rememberMe) {
+        localStorage.setItem(REMEMBER_ADMIN_KEY, 'true')
+        localStorage.setItem(ADMIN_EMAIL_KEY, email)
+      } else {
+        localStorage.removeItem(REMEMBER_ADMIN_KEY)
+        localStorage.removeItem(ADMIN_EMAIL_KEY)
+      }
+    } catch {
+      /* ignore storage errors */
+    }
+  }, [email, rememberMe])
+
   async function handleSubmit(event) {
     event.preventDefault()
     setError('')
     setLoading(true)
     try {
-      await signIn(email, password)
-      // Simple timeout to allow role to be set
-      setTimeout(() => {
-        console.log('AdminLoginPage - Role check:', role, 'from:', from)
-        // Check if role is properly set
-        if (!role) {
-          console.log('AdminLoginPage - No role set, showing error')
-          setError('Your account does not have admin permissions. Please contact an administrator.')
-          setLoading(false)
-          return
-        }
-        
-        // Redirect based on role
-        if (role === 'admin') {
-          console.log('AdminLoginPage - Admin role, navigating to:', from)
-          navigate(from)
-        } else {
-          console.log('AdminLoginPage - Non-admin role, showing error for role:', role)
-          setError(`This login is for administrators only. Your account has role: ${role}. Please use the appropriate login page.`)
-          setLoading(false)
-        }
-      }, 500)
+      const { role: signedInRole } = await signIn(email, password, { rememberMe })
+      if (!signedInRole) {
+        setError('Your account does not have admin permissions. Please contact an administrator.')
+        setLoading(false)
+        return
+      }
+      
+      // Redirect based on role
+      if (signedInRole === 'admin') {
+        navigate(from)
+      } else {
+        setError(`This login is for administrators only. Your account has role: ${signedInRole}. Please use the appropriate login page.`)
+        setLoading(false)
+      }
     } catch (err) {
       setError(err?.message || 'Could not sign in.')
       setLoading(false)
@@ -139,6 +163,7 @@ export default function AdminLoginPage() {
                 <input
                   className={styles.input}
                   type="email"
+                  name="email"
                   autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -155,6 +180,7 @@ export default function AdminLoginPage() {
                 <input
                   className={styles.input}
                   type={showPassword ? "text" : "password"}
+                  name="password"
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

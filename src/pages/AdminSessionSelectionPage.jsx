@@ -7,19 +7,19 @@ import { Plus, CheckCircle, AlertTriangle, Plane, ArrowLeft, Loader2, ListTodo, 
 import { useSession } from '../context/useSession'
 import { useToast } from '../context/useToast'
 import { getAuthToken } from '../utils/authToken'
-import { getSessionSummary, createSession } from '../services/flightSessionService'
+import { getSessionSummary, createSession, lookupFlightRoute } from '../services/flightSessionService'
 import SessionConfirmModal from '../components/common/SessionConfirmModal'
-import { getDefaultRoute } from '../utils/roleBasedRoutes'
 import styles from './AdminSessionSelectionPage.module.css'
 
 export default function AdminSessionSelectionPage() {
-  const { setActiveSessionId, activeSessionId } = useSession()
+  const { setActiveSessionId, activeSessionId, setSession } = useSession()
   const { showSuccess, showError } = useToast()
   const navigate = useNavigate()
   
   const [sessions, setSessions] = useState([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
+  const [routeLookupLoading, setRouteLookupLoading] = useState(false)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(null)
   const [selectedSession, setSelectedSession] = useState(null)
@@ -74,7 +74,7 @@ export default function AdminSessionSelectionPage() {
       const result = await createSession(formData, token)
       if (result.ok) {
         showSuccess('Session created successfully')
-        await handleSelectSession(result.session.id)
+        handleSelectSession(result.session)
         setFormData({
           flight_number: '',
           date: '',
@@ -85,7 +85,7 @@ export default function AdminSessionSelectionPage() {
       } else {
         showError(result.error || 'Failed to create session')
       }
-    } catch (err) {
+    } catch {
       showError('Failed to create session')
     } finally {
       setCreating(false)
@@ -98,10 +98,49 @@ export default function AdminSessionSelectionPage() {
   }
 
   async function confirmSelectSession(sessionId) {
+    const session = selectedSession || sessions.find((item) => item.id === sessionId)
+    const ok = await setSession({
+      sessionId,
+      sessionInfo: session,
+      role: 'admin',
+    })
+    if (!ok) {
+      showError('Failed to select session')
+      return
+    }
     setActiveSessionId(sessionId)
     showSuccess('Session selected successfully')
     // Navigate directly to admin dashboard
-    navigate('/admin')
+    navigate('/admin', { replace: true })
+  }
+
+  async function handleFlightLookup() {
+    const flightNumber = formData.flight_number?.trim()
+    if (!flightNumber) {
+      showError('Flight number is required to look up flight details')
+      return
+    }
+
+    try {
+      setRouteLookupLoading(true)
+      const token = await getAuthToken()
+      const result = await lookupFlightRoute(flightNumber, formData.date, token)
+      if (result.ok && result.route) {
+        setFormData((current) => ({
+          ...current,
+          date: current.date || result.flight_date || '',
+          departure_time: current.departure_time || result.departure_time || '',
+          route: result.route,
+        }))
+        showSuccess('Flight details found from real-time data')
+      } else {
+        showError(result.error || 'Flight details not found')
+      }
+    } catch {
+      showError('Failed to look up flight details')
+    } finally {
+      setRouteLookupLoading(false)
+    }
   }
 
   const getTodayDate = () => new Date().toISOString().split('T')[0]
@@ -174,7 +213,25 @@ export default function AdminSessionSelectionPage() {
             <form onSubmit={handleCreateSession} className={styles.form}>
               <div className={styles.formRow}>
                 <label className={styles.label}>
-                  Flight number
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+                    Flight number
+                    <button
+                      type="button"
+                      onClick={handleFlightLookup}
+                      disabled={creating || routeLookupLoading}
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        color: '#2563eb',
+                        cursor: creating || routeLookupLoading ? 'not-allowed' : 'pointer',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        padding: 0,
+                      }}
+                    >
+                      {routeLookupLoading ? 'Looking up...' : 'Lookup'}
+                    </button>
+                  </span>
                   <input
                     type="text"
                     placeholder="e.g. MH123"
@@ -186,6 +243,9 @@ export default function AdminSessionSelectionPage() {
                     disabled={creating}
                     required
                   />
+                  <span style={{ color: '#6b7280', fontSize: '0.75rem', fontWeight: '400', marginTop: '0.375rem' }}>
+                    Lookup only works for flights currently available in Aviationstack real-time data.
+                  </span>
                 </label>
                 
                 <label className={styles.label}>
@@ -328,7 +388,6 @@ export default function AdminSessionSelectionPage() {
               </div>
             ) : sessions.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '2rem' }}>
-                <Plane size={48} style={{ color: '#9ca3af', marginBottom: '1rem' }} />
                 <h3 style={{ color: '#374151', marginBottom: '0.5rem' }}>No Active Sessions</h3>
                 <p style={{ color: '#6b7280', marginBottom: '2rem' }}>Create a new session to get started.</p>
                 <button

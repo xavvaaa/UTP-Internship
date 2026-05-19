@@ -68,7 +68,9 @@ export default function App() {
               path="/crew/dashboard"
               element={
                 <RequireRole allowedRoles={['crew']}>
-                  <AdminDashboardPage />
+                  <RequireFlightInstance>
+                    <AdminDashboardPage />
+                  </RequireFlightInstance>
                 </RequireRole>
               }
             />

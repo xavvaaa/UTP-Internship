@@ -25,7 +25,6 @@ import {
   updateMenuMeal,
 } from '../services/admin/menuAdminService'
 import { uploadMenuItemImage } from '../services/storageService'
-import { getDefaultRoute } from '../utils/roleBasedRoutes'
 import styles from './AdminDashboardPage.module.css'
 
 export default function AdminDashboardPage() {
@@ -46,6 +45,7 @@ export default function AdminDashboardPage() {
 
   const hasActiveSession = Boolean(activeSessionId)
   const canManageSessions = role === 'admin' || hasActiveSession
+  const dashboardRoute = role === 'crew' ? '/crew/dashboard' : '/admin'
 
   const [activeTab, setActiveTab] = useState('orders')
 
@@ -65,20 +65,17 @@ export default function AdminDashboardPage() {
       const defaultTab = role === 'admin' ? 'orders' : (isAssignedToActiveFlight ? 'orders' : null)
       if (defaultTab) {
         setActiveTab(defaultTab)
-        // Use role-based routing instead of hardcoded /admin
-        const defaultRoute = getDefaultRoute(role)
-        navigate(`${defaultRoute}?tab=${defaultTab}`)
+        navigate(`${dashboardRoute}?tab=${defaultTab}`)
       }
     }
-  }, [location.search, role, isAssignedToActiveFlight, navigate])
+  }, [location.search, role, isAssignedToActiveFlight, navigate, dashboardRoute])
 
   // Handle tab changes with URL synchronization
   const handleTabChange = (tabId) => {
     if (tabAllowed(tabId)) {
       setActiveTab(tabId)
-      // Update URL parameter when tab changes - use role-based routing
-      const defaultRoute = getDefaultRoute(role)
-      navigate(`${defaultRoute}?tab=${tabId}`)
+      // Update URL parameter when tab changes while staying on the dashboard route.
+      navigate(`${dashboardRoute}?tab=${tabId}`)
     }
   }
 
