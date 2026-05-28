@@ -1,0 +1,111 @@
+/**
+ * IFMOD global tokens and mobile-first base styles.
+ */
+:root {
+  --ifmod-bg: #eef4fb;
+  --ifmod-surface: #ffffff;
+  --ifmod-border: rgba(29, 67, 106, 0.18);
+  --ifmod-text: #152639;
+  --ifmod-muted: #5d738d;
+  --ifmod-accent: #18679a;
+  --ifmod-accent-soft: rgba(24, 103, 154, 0.12);
+  --ifmod-success: #1c7863;
+  --ifmod-danger: #b63933;
+  --ifmod-shadow: 0 20px 45px rgba(21, 38, 57, 0.09);
+
+  color: var(--ifmod-text);
+  background-color: var(--ifmod-bg);
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: radial-gradient(circle at top, rgba(24, 103, 154, 0.08), transparent 35%), var(--ifmod-bg);
+  color: var(--ifmod-text);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--ifmod-accent);
+  outline-offset: 2px;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+.ifmod-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.85rem;
+  background: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  color: var(--ifmod-accent);
+  box-shadow: 0 10px 25px rgba(44, 62, 80, 0.06);
+}
+
+.ifmod-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--ifmod-border);
+  background: var(--ifmod-surface);
+  color: var(--ifmod-text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.ifmod-icon-btn:hover {
+  border-color: var(--ifmod-accent);
+  background: #fff7ed;
+}
+
+.ifmod-icon-btn:focus-visible {
+  outline: 2px solid var(--ifmod-accent);
+  outline-offset: 2px;
+}

@@ -1,0 +1,29 @@
+.wrap {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.item {
+  margin: 0;
+}
+
+.empty {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ifmod-muted);
+}

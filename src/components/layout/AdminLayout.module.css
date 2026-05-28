@@ -1,0 +1,35 @@
+/* Admin Layout Styles */
+.adminLayout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: 280px;
+  padding: 2rem;
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+}
+
+/* Adjust for collapsed sidebar */
+body[data-sidebar-collapsed="true"] .mainContent {
+  margin-left: 80px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .mainContent {
+    margin-left: 0;
+    padding: 1rem;
+    padding-top: 4rem; /* Account for mobile toggle */
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: 0.75rem;
+    padding-top: 3.5rem;
+  }
+}

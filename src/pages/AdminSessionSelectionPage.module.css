@@ -1,0 +1,950 @@
+.pageContainer {
+  min-height: 100vh;
+  background-color: var(--ifmod-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background-color: var(--ifmod-surface);
+  border-bottom: 1px solid var(--ifmod-border);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.backBtn {
+  position: absolute;
+  top: 1.5rem;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background-color: var(--ifmod-bg);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.5rem;
+  color: var(--ifmod-text);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  background-color: var(--ifmod-accent-soft);
+  border-color: var(--ifmod-accent);
+}
+
+.headerContent {
+  flex: 1;
+  text-align: center;
+  color: var(--ifmod-text);
+}
+
+.headerContent h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ifmod-text);
+}
+
+.headerContent p {
+  margin: 0.5rem 0 0 0;
+  color: var(--ifmod-muted);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--ifmod-muted);
+  font-size: 1rem;
+  background-color: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+}
+
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+  color: var(--ifmod-text);
+}
+
+.emptyIcon {
+  margin-bottom: 1.5rem;
+  color: var(--ifmod-muted);
+}
+
+.empty h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ifmod-text);
+}
+
+.empty p {
+  margin: 0 0 2rem 0;
+  color: var(--ifmod-muted);
+  font-size: 0.875rem;
+}
+
+.sessionList {
+  margin-bottom: 2rem;
+}
+
+.sessionList h2 {
+  color: var(--ifmod-text);
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.sessionCard {
+  background-color: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sessionCard:hover {
+  border-color: var(--ifmod-accent);
+  background-color: var(--ifmod-surface);
+}
+
+.sessionCard.selected {
+  border-color: var(--ifmod-accent);
+  background-color: var(--ifmod-accent-soft);
+}
+
+.sessionInfo {
+  flex: 1;
+}
+
+.flightNumber {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ifmod-text);
+  margin-bottom: 0.375rem;
+}
+
+.sessionDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--ifmod-muted);
+}
+
+.date, .time, .route, .code {
+  padding: 0.1875rem 0.625rem;
+  background-color: var(--ifmod-bg);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+.sessionStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ifmod-success);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.25rem 0.625rem;
+  background-color: var(--ifmod-accent-soft);
+  border: 1px solid var(--ifmod-success);
+  border-radius: 0.375rem;
+}
+
+.currentBadge {
+  position: absolute;
+  top: -0.375rem;
+  right: -0.375rem;
+  background-color: var(--ifmod-accent);
+  color: white;
+  padding: 0.1875rem 0.625rem;
+  border-radius: 0.375rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.footerActions {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.createBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background-color: var(--ifmod-accent);
+  color: white;
+  border: 1px solid var(--ifmod-accent);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.createBtn:hover {
+  background-color: var(--ifmod-text);
+  border-color: var(--ifmod-text);
+}
+
+/* Create Form Styles */
+.createForm {
+  background-color: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  color: var(--ifmod-text);
+}
+
+.formHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ifmod-text);
+}
+
+.formHeader .backBtn {
+  background-color: var(--ifmod-bg);
+  border: 1px solid var(--ifmod-border);
+  color: var(--ifmod-text);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.formHeader .backBtn:hover {
+  background-color: var(--ifmod-accent-soft);
+  border-color: var(--ifmod-accent);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formRow {
+  display: flex;
+  gap: 1rem;
+}
+
+.formGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ifmod-text);
+}
+
+.input {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--ifmod-text);
+  background-color: var(--ifmod-surface);
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--ifmod-accent);
+  box-shadow: 0 0 0 2px var(--ifmod-accent-soft);
+}
+
+.input:disabled {
+  background-color: var(--ifmod-bg);
+  color: var(--ifmod-muted);
+  cursor: not-allowed;
+}
+
+.submitBtn {
+  padding: 0.625rem 1.25rem;
+  background-color: var(--ifmod-accent);
+  color: white;
+  border: 1px solid var(--ifmod-accent);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background-color: var(--ifmod-text);
+  border-color: var(--ifmod-text);
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .headerContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .headerContent h1 {
+    font-size: 1.25rem;
+  }
+
+  .headerContent p {
+    font-size: 0.8rem;
+    max-width: 100%;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .sessionCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .sessionInfo {
+    width: 100%;
+  }
+
+  .flightNumber {
+    font-size: 1rem;
+  }
+
+  .sessionDetails {
+    gap: 0.375rem;
+  }
+
+  .sessionStatus {
+    align-self: flex-start;
+  }
+
+  .formRow {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .createForm {
+    padding: 1rem;
+  }
+
+  .formHeader {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+
+  .formHeader h3 {
+    font-size: 1.125rem;
+  }
+
+  .createBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .submitBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0.75rem;
+  }
+
+  .headerContent h1 {
+    font-size: 1.125rem;
+  }
+
+  .headerContent p {
+    font-size: 0.75rem;
+  }
+
+  .content {
+    padding: 0.75rem;
+  }
+
+  .sessionCard {
+    padding: 0.75rem;
+  }
+
+  .flightNumber {
+    font-size: 0.875rem;
+  }
+
+  .sessionDetails {
+    gap: 0.25rem;
+  }
+
+  .date, .time, .route, .code {
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .createForm {
+    padding: 0.75rem;
+  }
+
+  .createBtn, .submitBtn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Import styles from AdminLoginPage for consistency */
+.loginContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+@media (min-width: 768px) {
+  .loginContainer {
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+
+.leftPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3rem;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.leftPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('../assets/Plane Meals.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+}
+
+.leftContent {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.logoSquare {
+  width: 48px;
+  height: 48px;
+  background-color: #2563eb;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.logoText {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.mainHeading {
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.accentLine {
+  width: 4rem;
+  height: 4px;
+  background-color: #3b82f6;
+  margin-bottom: 1.5rem;
+  border-radius: 2px;
+}
+
+.description {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 400px;
+  margin-bottom: 3rem;
+}
+
+.featureCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.featureCard {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.featureIcon {
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-bottom: 0.75rem;
+}
+
+.featureContent h3 {
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.featureContent p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.rightPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  background-color: #f8fafc;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 576px;
+  background-color: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: auto;
+}
+
+.lockBadge {
+  width: 64px;
+  height: 64px;
+  background-color: #eff6ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: #2563eb;
+}
+
+.loginTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.loginSubtitle {
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formRow {
+  display: flex;
+  gap: 1rem;
+}
+
+.formRow .label {
+  flex: 1;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.buttonRow .button {
+  flex: 1;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: white;
+  color: #1f2937;
+  padding: 0.875rem 1rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.button {
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  min-height: 3rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.sessionPickListHeader {
+  margin-bottom: 1.5rem;
+}
+
+.sessionPickListTitle {
+  color: #374151;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.sessionPickListHint {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.sessionPickCard {
+  background-color: #f9fafb;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.sessionPickCard:hover {
+  border-color: #3b82f6;
+  background-color: #f3f4f6;
+}
+
+.sessionPickCardSelected {
+  background-color: #dbeafe;
+  border-color: #3b82f6;
+}
+
+.sessionPickCardSelected:hover {
+  background-color: #dbeafe;
+  border-color: #3b82f6;
+}
+
+.sessionPickFlight {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.375rem;
+}
+
+.sessionPickMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.sessionPickTag {
+  padding: 0.1875rem 0.625rem;
+  background-color: #f3f4f6;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e5e7eb;
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+.sessionPickStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #10b981;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.sessionPickSelectedBadge {
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.1875rem 0.625rem;
+  border-radius: 0.375rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.createSessionBtnFull {
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+/* Large screens - no scrolling needed */
+@media (min-width: 1200px) {
+  .loginCard {
+    padding: 2rem;
+    max-width: 600px;
+  }
+  
+  .form {
+    gap: 0.875rem;
+  }
+  
+  .formRow {
+    gap: 0.875rem;
+  }
+  
+  .buttonRow {
+    gap: 0.875rem;
+  }
+}
+
+/* iPad-specific optimizations - scrolling only when needed */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .loginCard {
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem;
+    margin: 1rem;
+  }
+  
+  .loginCard::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .loginCard::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  .loginCard::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+  
+  .loginCard::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+  
+  .loginTitle {
+    font-size: 1.5rem;
+  }
+  
+  .loginSubtitle {
+    font-size: 0.9rem;
+  }
+  
+  .form {
+    gap: 1rem;
+  }
+  
+  .input {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .button {
+    min-height: 2.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .mainHeading {
+    font-size: 2.5rem;
+  }
+  
+  .featureCards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .leftPanel {
+    padding: 2rem;
+  }
+  
+  .rightPanel {
+    padding: 2rem;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+  .loginContainer {
+    flex-direction: column;
+  }
+  
+  .leftPanel {
+    padding: 2rem;
+    min-height: auto;
+  }
+  
+  .mainHeading {
+    font-size: 2rem;
+  }
+  
+  .featureCards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .rightPanel {
+    padding: 1.5rem;
+  }
+  
+  .loginCard {
+    padding: 2rem;
+    min-height: auto;
+  }
+  
+  .loginTitle {
+    font-size: 1.5rem;
+  }
+}

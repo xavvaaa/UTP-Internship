@@ -1,0 +1,78 @@
+.section {
+  margin-bottom: 1.25rem;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.heading {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ifmod-accent);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 999px;
+  padding: 0.2rem 0.45rem;
+  background: var(--ifmod-accent-soft);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.65rem;
+  border: 1px solid var(--ifmod-border);
+  background: var(--ifmod-surface);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.row:hover:not(.rowDisabled) {
+  border-color: var(--ifmod-accent);
+  background: rgba(24, 103, 154, 0.08);
+}
+
+.rowActive {
+  border-color: var(--ifmod-accent);
+  background: var(--ifmod-accent-soft);
+}
+
+.rowDisabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.input {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--ifmod-accent);
+  flex-shrink: 0;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--ifmod-text);
+  flex: 1;
+}

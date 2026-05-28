@@ -1,0 +1,50 @@
+.wrap {
+  background: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.head {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.items {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ifmod-muted);
+  line-height: 1.35;
+}
+
+.track {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.step {
+  font-size: 0.78rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--ifmod-border);
+  color: var(--ifmod-muted);
+}
+
+.done {
+  border-color: rgba(74, 222, 128, 0.45);
+  color: #86efac;
+}
+
+.current {
+  border-color: var(--ifmod-accent);
+  color: var(--ifmod-text);
+}
