@@ -33,6 +33,7 @@ export default function SessionsTab() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isFormExpanded, setIsFormExpanded] = useState(false)
   const [isStatusGuideExpanded, setIsStatusGuideExpanded] = useState(false)
+  const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false)
   const [showCrewAssignment, setShowCrewAssignment] = useState(null)
   const [openMenuId, setOpenMenuId] = useState(null)
   const [confirmDialog, setConfirmDialog] = useState({
@@ -119,6 +120,7 @@ export default function SessionsTab() {
           departure_time: '',
           route: '',
         })
+        setIsCreatePanelOpen(false)
         await fetchSummary()
       } else {
         showError(result.error || 'Failed to create session')
@@ -339,11 +341,244 @@ export default function SessionsTab() {
     return { activeSessions: active, pastSessions: past }
   }, [displaySessions])
 
+  const sessionStats = [
+    { label: 'Active', value: activeSessions.length },
+    { label: 'Past', value: pastSessions.length },
+    { label: 'Showing', value: displaySessions.length },
+  ]
+
+  const statusOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'active', label: 'Active' },
+    { value: 'ended', label: 'Ended' },
+    { value: 'expired', label: 'Expired' },
+  ]
+
+  const currentSession = getCurrentSessionInfo()
+
+  function formatFlightDate(value) {
+    if (!value) return 'Not set'
+    const parts = String(value).split('-')
+    if (parts.length !== 3) return value
+    const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]))
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+  }
+
+  function formatSessionDateTime(value) {
+    if (!value) return ''
+    return new Date(value).toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    })
+  }
+
+  function renderSessionCard(session) {
+    const expiryPrefix = session.status === 'expired' ? 'Expired' : 'Expires'
+    const isSelected = selectedSessions.has(session.id)
+
+    return (
+      <div
+        key={session.id}
+        className={`${styles.sessionCard} ${styles[session.status] ?? ''} ${showDetails?.id === session.id ? styles.selected : ''} ${showMultiSelect ? styles.multiSelectMode : ''} ${activeSessionId === session.id ? styles.activeSession : ''}`}
+        onClick={() => !showMultiSelect && handleSessionClick(session)}
+        style={{ cursor: showMultiSelect ? 'default' : 'pointer' }}
+      >
+        <div className={styles.sessionHeader}>
+          {showMultiSelect && (
+            <div className={styles.checkboxContainer}>
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() => toggleSessionSelection(session.id)}
+                onClick={(e) => e.stopPropagation()}
+                aria-label={`Select ${session.flight_number}`}
+              />
+            </div>
+          )}
+          <div className={styles.sessionInfo}>
+            <div className={styles.sessionIdentity}>
+              <div className={styles.flightNumber}>{session.flight_number}</div>
+              <div className={styles.sessionRoute}>{session.route || 'Route not set'}</div>
+            </div>
+            <div className={styles.sessionDetails}>
+              <span className={styles.metaItem}>
+                <span className={styles.metaLabel}>Date</span>
+                <span className={styles.metaValue}>{formatFlightDate(session.date)}</span>
+              </span>
+              {session.departure_time && (
+                <span className={styles.metaItem}>
+                  <span className={styles.metaLabel}>Time</span>
+                  <span className={styles.metaValue}>{session.departure_time}</span>
+                </span>
+              )}
+              {session.access_code && (
+                <span className={styles.metaItem}>
+                  <span className={styles.metaLabel}>Code</span>
+                  <span className={styles.metaValue}>{session.access_code}</span>
+                </span>
+              )}
+              {session.expires_at && (
+                <span className={`${styles.metaItem} ${styles.expiration}`}>
+                  <span className={styles.metaLabel}>{expiryPrefix}</span>
+                  <span className={styles.metaValue}>{formatSessionDateTime(session.expires_at)}</span>
+                </span>
+              )}
+            </div>
+          </div>
+          <div className={styles.sessionOperations}>
+            <div className={styles.statusBadge}>
+              {session.status === 'active' ? (
+                <CheckCircle size={16} />
+              ) : (
+                <AlertTriangle size={16} />
+              )}
+              <span>{session.status}</span>
+            </div>
+            <div className={styles.sessionActions}>
+              <div className={styles.menuWrap} onMouseDown={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  className={styles.menuBtn}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setOpenMenuId((prev) => (prev === session.id ? null : session.id))
+                  }}
+                  title="Actions"
+                  aria-haspopup="menu"
+                  aria-expanded={openMenuId === session.id}
+                >
+                  <MoreVertical size={16} />
+                </button>
+
+                {openMenuId === session.id && (
+                  <div className={styles.menu} role="menu" onClick={(e) => e.stopPropagation()}>
+                    {session.status === 'active' && (
+                      <>
+                        <button
+                          type="button"
+                          className={styles.menuItem}
+                          onClick={() => {
+                            setOpenMenuId(null)
+                            handleEdit(session)
+                          }}
+                          role="menuitem"
+                        >
+                          <Edit size={14} />
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.menuItem}
+                          onClick={() => {
+                            setOpenMenuId(null)
+                            handleCrewAssignment(session)
+                          }}
+                          role="menuitem"
+                        >
+                          <Users size={14} />
+                          Assign crew
+                        </button>
+                        {activeSessionId !== session.id && (
+                          <button
+                            type="button"
+                            className={styles.menuItem}
+                            onClick={() => {
+                              setOpenMenuId(null)
+                              handleSwitchSession(session.id)
+                            }}
+                            role="menuitem"
+                          >
+                            <CheckCircle size={14} />
+                            Switch to this session
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className={`${styles.menuItem} ${styles.dangerItem}`}
+                          onClick={() => {
+                            setOpenMenuId(null)
+                            handleEnd(session.id)
+                          }}
+                          role="menuitem"
+                        >
+                          <Square size={14} />
+                          End session
+                        </button>
+                      </>
+                    )}
+
+                    {(session.status === 'ended' || session.status === 'expired') && (
+                      <>
+                        <button
+                          type="button"
+                          className={styles.menuItem}
+                          onClick={() => {
+                            setOpenMenuId(null)
+                            handleActivate(session.id)
+                          }}
+                          role="menuitem"
+                        >
+                          <Play size={14} />
+                          Reactivate
+                        </button>
+                        <button
+                          type="button"
+                          className={`${styles.menuItem} ${styles.dangerItem}`}
+                          onClick={() => {
+                            setOpenMenuId(null)
+                            handleDelete(session.id)
+                          }}
+                          role="menuitem"
+                        >
+                          <Trash2 size={14} />
+                          Delete
+                        </button>
+                      </>
+                    )}
+
+                    {session.status === 'deleted' && (
+                      <button
+                        type="button"
+                        className={styles.menuItem}
+                        onClick={() => {
+                          setOpenMenuId(null)
+                          handleActivate(session.id)
+                        }}
+                        role="menuitem"
+                      >
+                        <Play size={14} />
+                        Restore
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.listCard}>
         <div className={styles.listHeader}>
-          <h3 className={styles.listTitle}>Sessions</h3>
+          <div className={styles.listTitleGroup}>
+            <div>
+              <h3 className={styles.listTitle}>Sessions</h3>
+            </div>
+            <div className={styles.listSummary} aria-label="Session summary">
+              {sessionStats.map((stat) => (
+                <span key={stat.label}>
+                  <strong>{stat.value}</strong>
+                  {stat.label}
+                </span>
+              ))}
+            </div>
+          </div>
           <div className={styles.headerControls}>
             <div className={styles.searchControls}>
               <input
@@ -361,20 +596,20 @@ export default function SessionsTab() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className={styles.filterSelect}
               >
-                <option value="all">All Sessions</option>
-                <option value="active">Active</option>
-                <option value="ended">Ended</option>
-                <option value="expired">Expired</option>
+                {statusOptions.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
               </select>
             </div>
             <div className={styles.multiSelectControls}>
               <button
                 type="button"
-                className={styles.multiSelectBtn}
+                className={`${styles.multiSelectBtn} ${showMultiSelect ? styles.active : ''}`}
                 onClick={() => setShowMultiSelect(!showMultiSelect)}
+                aria-pressed={showMultiSelect}
               >
                 <CheckSquare2 size={16} />
-                {showMultiSelect ? 'Cancel Selection' : 'Multi-Select'}
+                {showMultiSelect ? 'Cancel' : 'Select'}
               </button>
               {showMultiSelect && selectedSessions.size > 0 && (
                 <div className={styles.bulkActions}>
@@ -385,53 +620,119 @@ export default function SessionsTab() {
                     onClick={handleBulkDelete}
                   >
                     <Trash2 size={14} />
-                    Delete Selected
+                    Delete
                   </button>
                 </div>
               )}
             </div>
+            <button
+              type="button"
+              className={styles.createToggleBtn}
+              onClick={() => setIsCreatePanelOpen((prev) => !prev)}
+            >
+              <Plus size={16} />
+              {isCreatePanelOpen ? 'Close form' : 'New session'}
+            </button>
           </div>
         </div>
 
-        {/* Current Session Display */}
-        {getCurrentSessionInfo() && (
-          <div className={styles.currentSessionCard}>
-            <div className={styles.currentSessionHeader}>
-              <h4>Currently Managing</h4>
-              <div className={styles.currentSessionHeaderRight}>
-                <button
-                  type="button"
-                  className={styles.copyCodeBtn}
-                  onClick={handleCopyAccessCode}
-                  title="Copy access code"
-                >
-                  <Copy size={14} />
-                  Copy code
-                </button>
-                <div className={styles.currentSessionBadge}>Active Session</div>
+        <div className={styles.currentSessionCard}>
+          {currentSession ? (
+            <>
+              <div className={styles.currentSessionHeader}>
+                <div>
+                  <h4>Currently managing</h4>
+                </div>
+                <div className={styles.currentSessionBadge}>{currentSession.status}</div>
               </div>
-            </div>
-            <div className={styles.currentSessionInfo}>
-              <div className={styles.currentSessionFlight}>
-                {getCurrentSessionInfo().flight_number}
+              <div className={styles.currentSessionCommand}>
+                <div className={styles.currentSessionInfo}>
+                  <div className={styles.currentSessionFlight}>
+                    {currentSession.flight_number}
+                  </div>
+                  <div className={styles.currentSessionRoute}>
+                    {currentSession.route || 'Route not set'}
+                  </div>
+                </div>
+                {currentSession.access_code && (
+                  <button
+                    type="button"
+                    className={styles.accessCodePill}
+                    onClick={handleCopyAccessCode}
+                    title="Copy access code"
+                  >
+                    <span>Access code</span>
+                    <strong>{currentSession.access_code}</strong>
+                    <Copy size={15} />
+                  </button>
+                )}
               </div>
-              <div className={styles.currentSessionDetails}>
-                <span>{getCurrentSessionInfo().date}</span>
-                {getCurrentSessionInfo().departure_time && (
-                  <span>{getCurrentSessionInfo().departure_time}</span>
+              <div className={styles.currentSessionMeta}>
+                <span>
+                  <strong>Date</strong>
+                  {currentSession.date || 'Not set'}
+                </span>
+                {currentSession.departure_time && (
+                  <span>
+                    <strong>Departure</strong>
+                    {currentSession.departure_time}
+                  </span>
                 )}
-                {getCurrentSessionInfo().route && (
-                  <span>{getCurrentSessionInfo().route}</span>
-                )}
-                {getCurrentSessionInfo().access_code && (
-                  <span className={styles.currentSessionCode}>
-                    Code: {getCurrentSessionInfo().access_code}
+                {currentSession.expires_at && (
+                  <span>
+                    <strong>{currentSession.status === 'expired' ? 'Expired' : 'Expires'}</strong>
+                    {new Date(currentSession.expires_at).toLocaleString()}
                   </span>
                 )}
               </div>
+              <div className={styles.commandActions}>
+                <button
+                  type="button"
+                  className={styles.secondaryCommandBtn}
+                  onClick={() => handleEdit(currentSession)}
+                >
+                  <Edit size={15} />
+                  Edit
+                </button>
+                {currentSession.status === 'active' && (
+                  <>
+                    <button
+                      type="button"
+                      className={styles.secondaryCommandBtn}
+                      onClick={() => handleCrewAssignment(currentSession)}
+                    >
+                      <Users size={15} />
+                      Assign crew
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.dangerCommandBtn}
+                      onClick={() => handleEnd(currentSession.id)}
+                    >
+                      <Square size={15} />
+                      End session
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className={styles.emptyCommandPanel}>
+              <div>
+                <h4>No session selected</h4>
+                <p>Create a new flight session or reactivate a past one to start accepting orders.</p>
+              </div>
+              <button
+                type="button"
+                className={styles.createToggleBtn}
+                onClick={() => setIsCreatePanelOpen(true)}
+              >
+                <Plus size={16} />
+                Create session
+              </button>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         <div className={styles.instructionCard}>
           <div className={styles.instructionHeader}>
@@ -484,9 +785,25 @@ export default function SessionsTab() {
         </div>
 
         {loading ? (
-          <div className={styles.message}>Loading...</div>
+          <div className={styles.skeletonList} aria-label="Loading sessions">
+            <div className={styles.skeletonRow}></div>
+            <div className={styles.skeletonRow}></div>
+            <div className={styles.skeletonRow}></div>
+          </div>
         ) : displaySessions.length === 0 ? (
-          <div className={styles.message}>No sessions yet.</div>
+          <div className={styles.emptyState}>
+            <CheckCircle size={28} />
+            <h4>No sessions match this view</h4>
+            <p>Try another status filter, clear the search, or create a new flight session.</p>
+            <button
+              type="button"
+              className={styles.createToggleBtn}
+              onClick={() => setIsCreatePanelOpen(true)}
+            >
+              <Plus size={16} />
+              New session
+            </button>
+          </div>
         ) : (
           <div className={styles.sessionsList}>
             {statusFilter === 'all' && (
@@ -499,183 +816,12 @@ export default function SessionsTab() {
                   <div className={styles.sectionCount}>{activeSessions.length}</div>
                 </div>
                 {activeSessions.length === 0 ? (
-                  <div className={styles.emptyInline}>No active session right now.</div>
+                  <div className={styles.emptyInline}>No active session right now. Create or reactivate one when cabin service is ready.</div>
                 ) : null}
               </>
             )}
 
-            {(statusFilter !== 'all' ? displaySessions : activeSessions).map((session) => (
-              <div
-                key={session.id}
-                className={`${styles.sessionCard} ${styles[session.status] ?? ''} ${showDetails?.id === session.id ? styles.selected : ''} ${showMultiSelect ? styles.multiSelectMode : ''} ${activeSessionId === session.id ? styles.activeSession : ''}`}
-                onClick={() => !showMultiSelect && handleSessionClick(session)}
-                style={{ cursor: showMultiSelect ? 'default' : 'pointer' }}
-              >
-                <div className={styles.sessionHeader}>
-                  {showMultiSelect && (
-                    <div className={styles.checkboxContainer}>
-                      <input
-                        type="checkbox"
-                        checked={selectedSessions.has(session.id)}
-                        onChange={() => toggleSessionSelection(session.id)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </div>
-                  )}
-                  <div className={styles.sessionInfo}>
-                    <div className={styles.flightNumber}>{session.flight_number}</div>
-                    <div className={styles.sessionDetails}>
-                      <span className={styles.date}>{session.date}</span>
-                      {session.departure_time && (
-                        <span className={styles.time}>{session.departure_time}</span>
-                      )}
-                      {session.route && <span className={styles.route}>{session.route}</span>}
-                      {session.access_code && (
-                        <span className={styles.route}>Code: {session.access_code}</span>
-                      )}
-                      {session.expires_at && (
-                        <span className={styles.expiration}>
-                          Expires: {new Date(session.expires_at).toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className={styles.statusBadge}>
-                    {session.status === 'active' ? (
-                      <CheckCircle size={16} />
-                    ) : (
-                      <AlertTriangle size={16} />
-                    )}
-                    <span>{session.status}</span>
-                  </div>
-                </div>
-
-                <div className={styles.sessionActions}>
-                  <div className={styles.menuWrap} onMouseDown={(e) => e.stopPropagation()}>
-                    <button
-                      type="button"
-                      className={styles.menuBtn}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setOpenMenuId((prev) => (prev === session.id ? null : session.id))
-                      }}
-                      title="Actions"
-                      aria-haspopup="menu"
-                      aria-expanded={openMenuId === session.id}
-                    >
-                      <MoreVertical size={16} />
-                    </button>
-
-                    {openMenuId === session.id && (
-                      <div
-                        className={styles.menu}
-                        role="menu"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {session.status === 'active' && (
-                          <>
-                            <button
-                              type="button"
-                              className={styles.menuItem}
-                              onClick={() => {
-                                setOpenMenuId(null)
-                                handleEdit(session)
-                              }}
-                              role="menuitem"
-                            >
-                              <Edit size={14} />
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              className={styles.menuItem}
-                              onClick={() => {
-                                setOpenMenuId(null)
-                                handleCrewAssignment(session)
-                              }}
-                              role="menuitem"
-                            >
-                              <Users size={14} />
-                              Assign crew
-                            </button>
-                            {activeSessionId !== session.id && (
-                              <button
-                                type="button"
-                                className={styles.menuItem}
-                                onClick={() => {
-                                  setOpenMenuId(null)
-                                  handleSwitchSession(session.id)
-                                }}
-                                role="menuitem"
-                              >
-                                <CheckCircle size={14} />
-                                Switch to this session
-                              </button>
-                            )}
-                            <button
-                              type="button"
-                              className={`${styles.menuItem} ${styles.dangerItem}`}
-                              onClick={() => {
-                                setOpenMenuId(null)
-                                handleEnd(session.id)
-                              }}
-                              role="menuitem"
-                            >
-                              <Square size={14} />
-                              End session
-                            </button>
-                          </>
-                        )}
-
-                        {(session.status === 'ended' || session.status === 'expired') && (
-                          <>
-                            <button
-                              type="button"
-                              className={styles.menuItem}
-                              onClick={() => {
-                                setOpenMenuId(null)
-                                handleActivate(session.id)
-                              }}
-                              role="menuitem"
-                            >
-                              <Play size={14} />
-                              Reactivate
-                            </button>
-                            <button
-                              type="button"
-                              className={`${styles.menuItem} ${styles.dangerItem}`}
-                              onClick={() => {
-                                setOpenMenuId(null)
-                                handleDelete(session.id)
-                              }}
-                              role="menuitem"
-                            >
-                              <Trash2 size={14} />
-                              Delete
-                            </button>
-                          </>
-                        )}
-
-                        {session.status === 'deleted' && (
-                          <button
-                            type="button"
-                            className={styles.menuItem}
-                            onClick={() => {
-                              setOpenMenuId(null)
-                              handleActivate(session.id)
-                            }}
-                            role="menuitem"
-                          >
-                            <Play size={14} />
-                            Restore
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
+            {(statusFilter !== 'all' ? displaySessions : activeSessions).map(renderSessionCard)}
 
             {statusFilter === 'all' && (
               <>
@@ -690,115 +836,7 @@ export default function SessionsTab() {
                   <div className={styles.emptyInline}>No past sessions yet.</div>
                 ) : null}
 
-                {pastSessions.map((session) => (
-                  <div
-                    key={session.id}
-                    className={`${styles.sessionCard} ${styles[session.status] ?? ''} ${showDetails?.id === session.id ? styles.selected : ''} ${showMultiSelect ? styles.multiSelectMode : ''} ${activeSessionId === session.id ? styles.activeSession : ''}`}
-                    onClick={() => !showMultiSelect && handleSessionClick(session)}
-                    style={{ cursor: showMultiSelect ? 'default' : 'pointer' }}
-                  >
-                    <div className={styles.sessionHeader}>
-                      {showMultiSelect && (
-                        <div className={styles.checkboxContainer}>
-                          <input
-                            type="checkbox"
-                            checked={selectedSessions.has(session.id)}
-                            onChange={() => toggleSessionSelection(session.id)}
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        </div>
-                      )}
-                      <div className={styles.sessionInfo}>
-                        <div className={styles.flightNumber}>{session.flight_number}</div>
-                        <div className={styles.sessionDetails}>
-                          <span className={styles.date}>{session.date}</span>
-                          {session.departure_time && (
-                            <span className={styles.time}>{session.departure_time}</span>
-                          )}
-                          {session.route && <span className={styles.route}>{session.route}</span>}
-                          {session.access_code && (
-                            <span className={styles.route}>Code: {session.access_code}</span>
-                          )}
-                          {session.expires_at && session.status === 'expired' && (
-                            <span className={styles.expiration}>
-                              Expired: {new Date(session.expires_at).toLocaleString()}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className={styles.statusBadge}>
-                        <AlertTriangle size={16} />
-                        <span>{session.status}</span>
-                      </div>
-                    </div>
-
-                    <div className={styles.sessionActions}>
-                      <div className={styles.menuWrap} onMouseDown={(e) => e.stopPropagation()}>
-                        <button
-                          type="button"
-                          className={styles.menuBtn}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setOpenMenuId((prev) => (prev === session.id ? null : session.id))
-                          }}
-                          title="Actions"
-                          aria-haspopup="menu"
-                          aria-expanded={openMenuId === session.id}
-                        >
-                          <MoreVertical size={16} />
-                        </button>
-
-                        {openMenuId === session.id && (
-                          <div className={styles.menu} role="menu" onClick={(e) => e.stopPropagation()}>
-                            {(session.status === 'ended' || session.status === 'expired') && (
-                              <>
-                                <button
-                                  type="button"
-                                  className={styles.menuItem}
-                                  onClick={() => {
-                                    setOpenMenuId(null)
-                                    handleActivate(session.id)
-                                  }}
-                                  role="menuitem"
-                                >
-                                  <Play size={14} />
-                                  Reactivate
-                                </button>
-                                <button
-                                  type="button"
-                                  className={`${styles.menuItem} ${styles.dangerItem}`}
-                                  onClick={() => {
-                                    setOpenMenuId(null)
-                                    handleDelete(session.id)
-                                  }}
-                                  role="menuitem"
-                                >
-                                  <Trash2 size={14} />
-                                  Delete
-                                </button>
-                              </>
-                            )}
-
-                            {session.status === 'deleted' && (
-                              <button
-                                type="button"
-                                className={styles.menuItem}
-                                onClick={() => {
-                                  setOpenMenuId(null)
-                                  handleActivate(session.id)
-                                }}
-                                role="menuitem"
-                              >
-                                <Play size={14} />
-                                Restore
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                {pastSessions.map(renderSessionCard)}
               </>
             )}
           </div>
@@ -806,118 +844,137 @@ export default function SessionsTab() {
 
       </div>
 
-      <div className={styles.formCard}>
-        <div className={styles.formHeader}>
-          <h3 className={styles.formTitle}>
-            <Plus size={20} />
-            Create Flight Session
-          </h3>
-        </div>
-        <div className={styles.formInstructions}>
-          <div className={styles.instructionHeader}>
-            <h4>Session Setup Guide</h4>
+      {isCreatePanelOpen && (
+        <div className={styles.formCard}>
+          <div className={styles.createPanelHeader}>
+            <div>
+              <h3 className={styles.formTitle}>
+                <Plus size={20} />
+                Create Flight Session
+              </h3>
+              <p>Open a flight for passenger access and cabin management.</p>
+            </div>
             <button
               type="button"
               className={styles.expandButton}
-              onClick={() => setIsFormExpanded(!isFormExpanded)}
-              aria-label={isFormExpanded ? 'Collapse setup guide' : 'Expand setup guide'}
-              title={isFormExpanded ? 'Collapse setup guide' : 'Expand setup guide'}
+              onClick={() => setIsCreatePanelOpen(false)}
+              aria-label="Close create session form"
+              title="Close create session form"
             >
-              {isFormExpanded ? (
-                <ChevronUp size={16} />
-              ) : (
-                <ChevronDown size={16} />
-              )}
+              <X size={16} />
             </button>
           </div>
-          {isFormExpanded && (
-            <div className={styles.instructionContent}>
-              <div className={styles.instructionGrid}>
-                <div className={styles.instructionItem}>
-                  <div className={styles.statusIndicator} data-status="setup"></div>
-                  <div>
-                    <strong>Create Session</strong>
-                    <p>One flight gets one passenger access code.</p>
-                  </div>
+
+          <>
+              <div className={styles.formInstructions}>
+                <div className={styles.instructionHeader}>
+                  <h4>Session Setup Guide</h4>
+                  <button
+                    type="button"
+                    className={styles.expandButton}
+                    onClick={() => setIsFormExpanded(!isFormExpanded)}
+                    aria-label={isFormExpanded ? 'Collapse setup guide' : 'Expand setup guide'}
+                    title={isFormExpanded ? 'Collapse setup guide' : 'Expand setup guide'}
+                  >
+                    {isFormExpanded ? (
+                      <ChevronUp size={16} />
+                    ) : (
+                      <ChevronDown size={16} />
+                    )}
+                  </button>
                 </div>
-                <div className={styles.instructionItem}>
-                  <div className={styles.statusIndicator} data-status="details"></div>
-                  <div>
-                    <strong>Flight Details</strong>
-                    <p>Flight, date, time, and route identify the session.</p>
+                {isFormExpanded && (
+                  <div className={styles.instructionContent}>
+                    <div className={styles.instructionGrid}>
+                      <div className={styles.instructionItem}>
+                        <div className={styles.statusIndicator} data-status="setup"></div>
+                        <div>
+                          <strong>Create Session</strong>
+                          <p>One flight gets one passenger access code.</p>
+                        </div>
+                      </div>
+                      <div className={styles.instructionItem}>
+                        <div className={styles.statusIndicator} data-status="details"></div>
+                        <div>
+                          <strong>Flight Details</strong>
+                          <p>Flight, date, time, and route identify the session.</p>
+                        </div>
+                      </div>
+                      <div className={styles.instructionItem}>
+                        <div className={styles.statusIndicator} data-status="manage"></div>
+                        <div>
+                          <strong>Status</strong>
+                          <p>Active sessions accept orders; ended or expired sessions do not.</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className={styles.instructionItem}>
-                  <div className={styles.statusIndicator} data-status="manage"></div>
-                  <div>
-                    <strong>Status</strong>
-                    <p>Active sessions accept orders; ended or expired sessions do not.</p>
-                  </div>
-                </div>
+                )}
               </div>
-            </div>
-          )}
+              <form onSubmit={handleCreateSession} className={styles.form}>
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Flight number *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. MH123"
+                      value={formData.flight_number}
+                      onChange={(e) =>
+                        setFormData({ ...formData, flight_number: e.target.value.toUpperCase() })
+                      }
+                      className={styles.input}
+                      disabled={creating}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Date *</label>
+                    <input
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      className={styles.input}
+                      min={getTodayDate()}
+                      disabled={creating}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Departure time *</label>
+                    <input
+                      type="time"
+                      value={formData.departure_time}
+                      onChange={(e) => setFormData({ ...formData, departure_time: e.target.value })}
+                      className={styles.input}
+                      disabled={creating}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Route</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. KUL-SIN"
+                      value={formData.route}
+                      onChange={(e) => setFormData({ ...formData, route: e.target.value })}
+                      className={styles.input}
+                      disabled={creating}
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.formFooter}>
+                  <button type="submit" className={styles.submitBtn} disabled={creating}>
+                    {creating ? 'Creating...' : 'Create session'}
+                  </button>
+                </div>
+              </form>
+          </>
         </div>
-        <form onSubmit={handleCreateSession} className={styles.form}>
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Flight number *</label>
-              <input
-                type="text"
-                placeholder="e.g. MH123"
-                value={formData.flight_number}
-                onChange={(e) =>
-                  setFormData({ ...formData, flight_number: e.target.value.toUpperCase() })
-                }
-                className={styles.input}
-                disabled={creating}
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Date *</label>
-              <input
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className={styles.input}
-                min={getTodayDate()}
-                disabled={creating}
-                required
-              />
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Departure time *</label>
-              <input
-                type="time"
-                value={formData.departure_time}
-                onChange={(e) => setFormData({ ...formData, departure_time: e.target.value })}
-                className={styles.input}
-                disabled={creating}
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Route</label>
-              <input
-                type="text"
-                placeholder="e.g. KUL-SIN"
-                value={formData.route}
-                onChange={(e) => setFormData({ ...formData, route: e.target.value })}
-                className={styles.input}
-                disabled={creating}
-              />
-            </div>
-          </div>
-
-          <button type="submit" className={styles.submitBtn} disabled={creating}>
-            {creating ? 'Creating...' : 'Create session'}
-          </button>
-        </form>
-      </div>
+      )}
 
       {/* Session Details Modal */}
       {showDetails && (
