@@ -2,7 +2,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -114,6 +114,106 @@
   color: var(--ifmod-muted);
 }
 
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(7rem, 1fr));
+  gap: 0.75rem;
+}
+
+.summaryCard {
+  min-height: 4.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+  background: var(--ifmod-surface);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.summaryValue {
+  color: var(--ifmod-text);
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.summaryLabel {
+  color: var(--ifmod-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.availableSummary {
+  border-color: rgba(22, 163, 74, 0.22);
+  background: rgba(74, 222, 128, 0.08);
+}
+
+.availableSummary .summaryValue {
+  color: #15803d;
+}
+
+.lowSummary {
+  border-color: rgba(217, 119, 6, 0.24);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.lowSummary .summaryValue {
+  color: #b45309;
+}
+
+.outSummary {
+  border-color: rgba(220, 38, 38, 0.22);
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.outSummary .summaryValue {
+  color: #b91c1c;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: minmax(16rem, 1.4fr) repeat(2, minmax(10rem, 0.8fr)) auto;
+  gap: 0.75rem;
+  align-items: end;
+  padding: 1rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+  background: var(--ifmod-surface);
+}
+
+.searchControl,
+.filterControl {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--ifmod-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.searchControl input,
+.filterControl select {
+  width: 100%;
+  min-height: 2.5rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  background: #fff;
+  color: var(--ifmod-text);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0 0.75rem;
+}
+
+.searchControl input:focus,
+.filterControl select:focus {
+  outline: 2px solid rgba(24, 103, 154, 0.25);
+  border-color: var(--ifmod-accent);
+}
+
 /* Messages */
 .message {
   display: flex;
@@ -192,8 +292,10 @@
 .addButton {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.625rem 1rem;
+  min-height: 2.5rem;
+  padding: 0 1rem;
   background: var(--ifmod-accent);
   color: #fff;
   border: 1px solid var(--ifmod-accent);
@@ -219,6 +321,7 @@
 
 /* Empty State */
 .emptyState {
+  grid-column: 1 / -1;
   text-align: center;
   padding: 2rem 1rem;
   background: rgba(24, 103, 154, 0.02);
@@ -806,6 +909,11 @@ select {
   .addButton {
     width: 100%;
     justify-content: center;
+  }
+
+  .summaryGrid,
+  .controls {
+    grid-template-columns: 1fr;
   }
 
   .itemCard {

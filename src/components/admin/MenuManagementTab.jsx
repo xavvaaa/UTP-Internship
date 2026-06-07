@@ -30,6 +30,9 @@ export default function MenuManagementTab({
   const [form, setForm] = useState(EMPTY_FORM)
   const [uploading, setUploading] = useState(false)
   const [showForm, setShowForm] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [stockFilter, setStockFilter] = useState('all')
+  const [sortMode, setSortMode] = useState('name')
   const [newOption, setNewOption] = useState({ drink: '', dessert: '', snack: '', allergen: '' })
 
   const meals = useMemo(
@@ -45,6 +48,45 @@ export default function MenuManagementTab({
   )
 
   const readOnly = role !== 'admin'
+
+  const menuStats = useMemo(() => {
+    const initial = { total: meals.length, available: 0, low: 0, out: 0, totalStock: 0 }
+    return meals.reduce((acc, item) => {
+      const stock = Number(item.stock || 0)
+      const stockStatus = getStockStatus(stock, item.lowStockThreshold || 20)
+      acc.totalStock += stock
+      if (stockStatus.status === 'available') acc.available += 1
+      if (stockStatus.status === 'low') acc.low += 1
+      if (stockStatus.status === 'out') acc.out += 1
+      return acc
+    }, initial)
+  }, [meals])
+
+  const visibleMeals = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase()
+    return meals
+      .filter((item) => {
+        const stockStatus = getStockStatus(item.stock || 0, item.lowStockThreshold || 20)
+        if (stockFilter !== 'all' && stockStatus.status !== stockFilter) return false
+        if (!query) return true
+        return [
+          item.name,
+          item.description,
+          ...(item.drinkOptions || []),
+          ...(item.dessertOptions || []),
+          ...(item.snackOptions || []),
+          ...(item.allergens || []),
+        ]
+          .join(' ')
+          .toLowerCase()
+          .includes(query)
+      })
+      .sort((a, b) => {
+        if (sortMode === 'stock-low') return Number(a.stock || 0) - Number(b.stock || 0)
+        if (sortMode === 'stock-high') return Number(b.stock || 0) - Number(a.stock || 0)
+        return String(a.name).localeCompare(String(b.name))
+      })
+  }, [meals, searchQuery, sortMode, stockFilter])
 
   // Helper function to determine stock status
   function getStockStatus(stockCount, lowThreshold) {
@@ -138,10 +180,56 @@ export default function MenuManagementTab({
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <div>
-          <p className={styles.subtitle}>Manage meals and track stock levels.</p>
+      <div className={styles.summaryGrid} aria-label="Menu summary">
+        <div className={styles.summaryCard}>
+          <span className={styles.summaryValue}>{menuStats.total}</span>
+          <span className={styles.summaryLabel}>Meals</span>
         </div>
+        <div className={`${styles.summaryCard} ${styles.availableSummary}`}>
+          <span className={styles.summaryValue}>{menuStats.available}</span>
+          <span className={styles.summaryLabel}>Available</span>
+        </div>
+        <div className={`${styles.summaryCard} ${styles.lowSummary}`}>
+          <span className={styles.summaryValue}>{menuStats.low}</span>
+          <span className={styles.summaryLabel}>Low stock</span>
+        </div>
+        <div className={`${styles.summaryCard} ${styles.outSummary}`}>
+          <span className={styles.summaryValue}>{menuStats.out}</span>
+          <span className={styles.summaryLabel}>Out</span>
+        </div>
+        <div className={styles.summaryCard}>
+          <span className={styles.summaryValue}>{menuStats.totalStock}</span>
+          <span className={styles.summaryLabel}>Total Stock</span>
+        </div>
+      </div>
+
+      <div className={styles.controls} aria-label="Menu list controls">
+        <label className={styles.searchControl}>
+          <span>Find</span>
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Meal, option, allergen"
+          />
+        </label>
+        <label className={styles.filterControl}>
+          <span>Stock</span>
+          <select value={stockFilter} onChange={(event) => setStockFilter(event.target.value)}>
+            <option value="all">All stock</option>
+            <option value="available">Available</option>
+            <option value="low">Low stock</option>
+            <option value="out">Out of stock</option>
+          </select>
+        </label>
+        <label className={styles.filterControl}>
+          <span>Sort</span>
+          <select value={sortMode} onChange={(event) => setSortMode(event.target.value)}>
+            <option value="name">Name</option>
+            <option value="stock-low">Stock: low first</option>
+            <option value="stock-high">Stock: high first</option>
+          </select>
+        </label>
         {!readOnly && (
           <button
             type="button"
@@ -172,8 +260,23 @@ export default function MenuManagementTab({
               </button>
             )}
           </div>
+        ) : visibleMeals.length === 0 ? (
+          <div className={styles.emptyState}>
+            <p>No meals match the current filters.</p>
+            <button
+              type="button"
+              className={styles.emptyAction}
+              onClick={() => {
+                setSearchQuery('')
+                setStockFilter('all')
+                setSortMode('name')
+              }}
+            >
+              Clear filters
+            </button>
+          </div>
         ) : (
-          meals.map((item) => (
+          visibleMeals.map((item) => (
             <div key={item.id} className={styles.mealCard}>
               {item.imageUrl && (
                 <div className={styles.mealImage}>

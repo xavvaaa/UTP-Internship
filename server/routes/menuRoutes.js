@@ -5,7 +5,7 @@ import {
   removeMenuMeal,
   updateMenuMeal,
 } from '../controllers/menuController.js'
-import { requireAuth, requireFlightClaim, requireAdmin, requireAdminOrFlightClaim } from '../middleware/authz.js'
+import { requireAuth, requireAdminOrFlightClaim } from '../middleware/authz.js'
 
 const menuRoutes = Router()
 

@@ -173,8 +173,28 @@ export default function AdminDashboardPage() {
   async function handleSaveMenu(id, form) {
     setSavingItem(true)
     try {
-      if (id) await updateMenuMeal(id, form, flightInstanceId)
-      else await createMenuMeal(form, flightInstanceId)
+      const result = id
+        ? await updateMenuMeal(id, form, flightInstanceId)
+        : await createMenuMeal(form, flightInstanceId)
+      const savedId = id || result?.id
+      if (savedId) {
+        const stock = Math.max(0, Number(form.stock ?? form.stockCount ?? 0))
+        const optimisticItem = {
+          ...form,
+          id: savedId,
+          stock,
+          category: 'meal',
+          available: stock > 0,
+          flightId: String(flightInstanceId ?? ''),
+        }
+        setMenuItems((prev) => {
+          const exists = prev.some((item) => item.id === savedId)
+          if (exists) {
+            return prev.map((item) => (item.id === savedId ? { ...item, ...optimisticItem } : item))
+          }
+          return [...prev, optimisticItem].sort((a, b) => String(a.name).localeCompare(String(b.name)))
+        })
+      }
       showSuccess(id ? 'Menu item updated successfully.' : 'Menu item created successfully.')
     } catch (err) {
       showError(err?.message || 'Could not save menu item.')
@@ -186,13 +206,12 @@ export default function AdminDashboardPage() {
   async function handleDeleteMenu(id, imageUrl) {
     try {
       await deleteMenuMeal(id, imageUrl)
+      setMenuItems((prev) => prev.filter((item) => item.id !== id))
       showSuccess('Menu item deleted successfully.')
     } catch (err) {
       showError(err?.message || 'Could not delete menu item.')
     }
   }
-
-  const getTodayDate = () => new Date().toISOString().split('T')[0]
 
   // Dynamic tab title and subtitle functions
   function getTabTitle(tab) {
@@ -217,30 +236,6 @@ export default function AdminDashboardPage() {
       settings: 'System and user settings'
     }
     return subtitles[tab] || `${new Date().toLocaleDateString()} ${'\u2022'} Flight ${flightNumber || 'N/A'}`
-  }
-
-  function getTabInstructions(tab, role) {
-    const instructions = {
-      orders: role === 'admin' 
-        ? 'Admin: View, update, and manage all passenger orders. Use seat map to assign seats and track order status.'
-        : 'Crew: View and manage orders for your assigned flight. Update order status as passengers are served.',
-      seatmap: role === 'admin'
-        ? 'Admin: View and manage seat assignments for any flight. Track passenger seating and availability.'
-        : 'Crew: View seat map for your assigned flight. Manage passenger seating requests.',
-      menu: role === 'admin'
-        ? 'Admin: Create, edit, and manage menu items for any flight. Set pricing and availability.'
-        : 'Crew: Manage menu items for your assigned flight. Update item availability as items run out.',
-      sessions: role === 'admin'
-        ? 'Admin: Create, edit, and manage all flight sessions. Set schedules, access codes, and manage session lifecycle.'
-        : 'Crew: Access to join active flight sessions using access codes.',
-      reports: role === 'admin'
-        ? 'Admin: View comprehensive reports for all flights and time periods. Export data for analysis.'
-        : 'Crew: View reports for your assigned flight session.',
-      settings: role === 'admin'
-        ? 'Admin: Manage system settings, user accounts, and global configuration.'
-        : 'Crew: Access system settings and preferences for your account.'
-    }
-    return instructions[tab] || ''
   }
 
   function tabAllowed(tab) {
