@@ -11,7 +11,6 @@ export default function SeatMapTab({ orders, menuItems, session }) {
     Math.max(...layout.cabins.flatMap((cabin) => cabin.rows.map((row) => row.sections[index]?.length || 0))),
   )
   const seatGridTemplateColumns = buildSeatGridColumns(maxSeatsPerSection)
-  const rowGridTemplateColumns = `minmax(42px, 0.75fr) ${seatGridTemplateColumns}`
   const sectionLabels = buildSectionLabels(layout, maxSections)
   const totalSeats = useMemo(
     () =>
@@ -67,7 +66,7 @@ export default function SeatMapTab({ orders, menuItems, session }) {
   }
 
   const renderSeatRow = (row, isBusiness = false) => (
-    <div key={row.number} className={`${styles.row} ${isBusiness ? styles.businessRow : ''}`} style={{ gridTemplateColumns: rowGridTemplateColumns }}>
+    <div key={row.number} className={`${styles.row} ${isBusiness ? styles.businessRow : ''}`} style={{ gridTemplateColumns: seatGridTemplateColumns }}>
       <div className={styles.rowNumber}>{row.number}</div>
       {sectionLabels.flatMap((labels, sectionIndex) => {
         const section = row.sections[sectionIndex] || []
@@ -90,7 +89,7 @@ export default function SeatMapTab({ orders, menuItems, session }) {
     <section className={styles.wrap}>
       <div className={styles.toolbar}>
         <div>
-          <h2 className={styles.title}>Seat Map</h2>
+          <h2 className={styles.title}>Cabin Layout</h2>
           <p className={styles.subtitle}>
             {layout.name} ({layout.aircraftType}) - {layout.description}
           </p>
@@ -129,8 +128,7 @@ export default function SeatMapTab({ orders, menuItems, session }) {
 
       <div className={styles.airplane}>
         {/* Column Labels */}
-        <div className={styles.columnLabels} style={{ gridTemplateColumns: rowGridTemplateColumns }}>
-          <div>Row</div>
+        <div className={styles.columnLabels} style={{ gridTemplateColumns: seatGridTemplateColumns }}>
           {sectionLabels.flatMap((section, sectionIndex) => [
             ...section.map((col) => <div key={`${sectionIndex}-${col}`}>{col}</div>),
             sectionIndex < sectionLabels.length - 1 ? <div key={`aisle-${sectionIndex}`}></div> : null,
@@ -193,11 +191,7 @@ export default function SeatMapTab({ orders, menuItems, session }) {
           </div>
 
           {/* Second row for galley */}
-          <div className={styles.backOfPlaneLayout} style={{ gridTemplateColumns: seatGridTemplateColumns }}>
-            {/* Empty spaces */}
-            <div></div>
-
-            {/* Galley in columns C-middle-D */}
+          <div className={styles.galleyRow}>
             <div className={styles.galley}>
               <div className={styles.galleyIcon}>
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2">
@@ -212,9 +206,6 @@ export default function SeatMapTab({ orders, menuItems, session }) {
               </div>
               <span className={styles.galleyLabel}>Galley</span>
             </div>
-
-            {/* Empty spaces */}
-            <div></div>
           </div>
           
           {/* Back of Plane Label */}
@@ -297,7 +288,6 @@ function buildSeatGridColumns(sectionWidths) {
     for (let i = 0; i < width; i += 1) columns.push('minmax(46px, 1fr)')
     if (index < sectionWidths.length - 1) columns.push('minmax(38px, 0.8fr)')
   })
-  columns.push('minmax(38px, 0.8fr)')
   return columns.join(' ')
 }
 

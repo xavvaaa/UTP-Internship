@@ -275,8 +275,8 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Status Cards - Only show when NOT on Settings tab */}
-      {activeTab !== 'settings' && (
+      {/* Status Cards - Seat map has its own cabin-focused summary. */}
+      {activeTab !== 'settings' && activeTab !== 'seatmap' && (
         <div className={styles.statusOverview}>
           <div className={styles.statusCards}>
             <div className={styles.statusCard}>
