@@ -1,50 +1,85 @@
 .wrap {
-  background: var(--ifmod-surface);
-  border: 1px solid var(--ifmod-border);
-  border-radius: 0.75rem;
-  padding: 0.65rem 0.75rem;
+  background: linear-gradient(135deg, rgba(24, 103, 154, 0.1), rgba(255, 255, 255, 0.96));
+  border: 1px solid rgba(24, 103, 154, 0.18);
+  border-radius: 1rem;
+  padding: 1rem;
   display: grid;
-  gap: 0.4rem;
+  gap: 0.75rem;
+  box-shadow: 0 14px 30px rgba(21, 38, 57, 0.06);
 }
 
 .head {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.35rem;
-  font-weight: 600;
-  font-size: 0.9rem;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--ifmod-accent);
+}
+
+.head h3 {
+  margin: 0.2rem 0 0;
+  color: var(--ifmod-text);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.kicker {
+  color: var(--ifmod-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .items {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   color: var(--ifmod-muted);
-  line-height: 1.35;
+  line-height: 1.45;
 }
 
 .track {
   margin: 0;
   padding: 0;
   list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
 }
 
 .step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
   font-size: 0.78rem;
-  padding: 0.25rem 0.45rem;
-  border-radius: 999px;
+  font-weight: 800;
+  padding: 0.55rem 0.45rem;
+  border-radius: 0.7rem;
   border: 1px solid var(--ifmod-border);
   color: var(--ifmod-muted);
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .done {
-  border-color: rgba(74, 222, 128, 0.45);
-  color: #86efac;
+  border-color: rgba(74, 222, 128, 0.35);
+  color: #15803d;
+  background: rgba(74, 222, 128, 0.12);
 }
 
 .current {
   border-color: var(--ifmod-accent);
   color: var(--ifmod-text);
+  box-shadow: 0 0 0 3px rgba(24, 103, 154, 0.1);
+}
+
+.stepIcon {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 520px) {
+  .track {
+    grid-template-columns: 1fr;
+  }
 }

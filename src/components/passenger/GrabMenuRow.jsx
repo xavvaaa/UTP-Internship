@@ -1,7 +1,7 @@
 /**
- * Grab-style meal row: image, title, description, chevron. Navigates to customize.
+ * Meal card for the passenger dashboard.
  */
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Utensils } from 'lucide-react'
 import styles from './GrabMenuRow.module.css'
 
 export default function GrabMenuRow({ item, onOpen, disabled }) {
@@ -19,13 +19,23 @@ export default function GrabMenuRow({ item, onOpen, disabled }) {
         {item.imageUrl ? (
           <img className={styles.img} src={item.imageUrl} alt="" loading="lazy" />
         ) : (
-          <div className={styles.ph} aria-hidden />
+          <div className={styles.ph} aria-hidden>
+            <Utensils size={24} />
+          </div>
         )}
       </div>
       <div className={styles.body}>
-        <h2 className={styles.title}>{item.name}</h2>
+        <div className={styles.titleRow}>
+          <h2 className={styles.title}>{item.name}</h2>
+          <span className={`${styles.stockBadge} ${out ? styles.outBadge : ''}`}>
+            {out ? 'Unavailable' : `${item.stock} left`}
+          </span>
+        </div>
         {item.description ? <p className={styles.desc}>{item.description}</p> : null}
-        <p className={styles.meta}>{out ? 'Unavailable' : `From menu · ${item.stock} left`}</p>
+        {item.allergens?.length ? (
+          <p className={styles.allergens}>Contains: {item.allergens.join(', ')}</p>
+        ) : null}
+        <p className={styles.meta}>{out ? 'Ask crew for alternatives' : 'Tap to customize drinks and sides'}</p>
       </div>
       <span className={styles.cta} aria-hidden>
         <ChevronRight size={22} strokeWidth={2} />
