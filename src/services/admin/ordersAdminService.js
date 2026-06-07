@@ -1,7 +1,7 @@
 /**
  * Admin real-time order subscriptions, sorting, and status transitions.
  */
-import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore'
+import { collection, onSnapshot, query, where } from 'firebase/firestore'
 import { auth, db } from '../../firebase/config'
 
 export const ORDER_STATUSES = ['pending', 'preparing', 'delivered']
@@ -100,6 +100,13 @@ export async function advanceOrderStatus(orderId, currentStatus) {
   if (!db) throw new Error('Firebase is not configured.')
   const next = getNextOrderStatus(String(currentStatus ?? '').toLowerCase())
   if (!next) return null
+  return setOrderStatus(orderId, next)
+}
+
+export async function setOrderStatus(orderId, status) {
+  if (!db) throw new Error('Firebase is not configured.')
+  const next = String(status ?? '').toLowerCase()
+  if (!ORDER_STATUSES.includes(next)) throw new Error('Invalid order status.')
   const tokenResult = await auth?.currentUser?.getIdTokenResult(true)
   const token = tokenResult?.token
   if (!token) throw new Error('Login required.')

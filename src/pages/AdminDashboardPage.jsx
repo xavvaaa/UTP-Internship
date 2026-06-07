@@ -17,7 +17,7 @@ import MenuManagementTab from '../components/admin/MenuManagementTab'
 import ReportsTab from '../components/admin/ReportsTab'
 import SettingsTab from '../components/admin/SettingsTab'
 import SessionsTab from '../components/admin/SessionsTab'
-import { advanceOrderStatus, sortOrders, subscribeOrders } from '../services/admin/ordersAdminService'
+import { advanceOrderStatus, setOrderStatus, sortOrders, subscribeOrders } from '../services/admin/ordersAdminService'
 import {
   createMenuMeal,
   deleteMenuMeal,
@@ -159,6 +159,17 @@ export default function AdminDashboardPage() {
     }
   }
 
+  async function handleSetOrderStatus(order, status) {
+    setUpdatingOrderId(order.id)
+    try {
+      await setOrderStatus(order.id, status)
+    } catch (err) {
+      showError(err?.message || 'Could not update order status.')
+    } finally {
+      setUpdatingOrderId('')
+    }
+  }
+
   async function handleSaveMenu(id, form) {
     setSavingItem(true)
     try {
@@ -275,8 +286,8 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Status Cards - Seat map has its own cabin-focused summary. */}
-      {activeTab !== 'settings' && activeTab !== 'seatmap' && (
+      {/* Status Cards - Order-focused tabs only. */}
+      {activeTab !== 'settings' && activeTab !== 'seatmap' && activeTab !== 'sessions' && activeTab !== 'menu' && (
         <div className={styles.statusOverview}>
           <div className={styles.statusCards}>
             <div className={styles.statusCard}>
@@ -333,7 +344,7 @@ export default function AdminDashboardPage() {
             menuItems={menuItems}
             session={sessionData}
             updatingOrderId={updatingOrderId}
-            onAdvance={handleAdvance}
+            onStatusChange={handleSetOrderStatus}
           />
         )}
 

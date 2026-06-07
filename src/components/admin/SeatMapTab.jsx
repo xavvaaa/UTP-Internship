@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { DEFAULT_SEAT_LAYOUT_ID, getSeatLayout } from '../../data/seatLayouts'
-import { getNextOrderStatus } from '../../services/admin/ordersAdminService'
+import { ORDER_STATUSES } from '../../services/admin/ordersAdminService'
 import styles from './SeatMapTab.module.css'
 
-export default function SeatMapTab({ orders, menuItems, session, updatingOrderId, onAdvance }) {
+export default function SeatMapTab({ orders, menuItems, session, updatingOrderId, onStatusChange }) {
   const layoutId = session?.seat_layout_id || DEFAULT_SEAT_LAYOUT_ID
   const [showDetails, setShowDetails] = useState(false)
   const [selectedSeatState, setSelectedSeatState] = useState({ layoutId, seat: '' })
@@ -53,7 +53,7 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
   const selectedSeatInfo = selectedSeat
     ? { ...(selectedOrder || {}), seat: selectedSeat, status: selectedOrder?.status || 'empty' }
     : null
-  const selectedNextStatus = selectedOrder ? getNextOrderStatus(selectedOrder.status) : null
+  const selectedOrderUpdating = selectedOrder && updatingOrderId === selectedOrder.id
 
   const summary = {
     total: orders.length,
@@ -150,7 +150,7 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
         <div className={styles.aircraftSummary}>
           <span className={styles.aircraftName}>{layout.name}</span>
           <span className={styles.aircraftMeta}>
-            {layout.aircraftType} · {layout.description}
+            {layout.aircraftType} - {layout.description}
           </span>
         </div>
         <div className={styles.toolbarActions}>
@@ -399,23 +399,31 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
             )}
             <div className={styles.modalActions}>
               {selectedOrder ? (
-                <button
-                  type="button"
-                  className={styles.advanceButton}
-                  onClick={() => onAdvance?.(selectedOrder)}
-                  disabled={!selectedNextStatus || updatingOrderId === selectedOrder.id}
-                >
-                  {updatingOrderId === selectedOrder.id ? (
-                    <>
-                      <Loader2 size={16} className={styles.spin} />
-                      Updating...
-                    </>
-                  ) : selectedNextStatus ? (
-                    `Mark as ${selectedNextStatus}`
-                  ) : (
-                    'Delivered'
-                  )}
-                </button>
+                <div className={styles.statusControls} aria-label="Update order status">
+                  <span className={styles.statusControlLabel}>
+                    {selectedOrderUpdating ? (
+                      <>
+                        <Loader2 size={14} className={styles.spin} />
+                        Updating status...
+                      </>
+                    ) : (
+                      'Update status'
+                    )}
+                  </span>
+                  <div className={styles.statusButtons}>
+                    {ORDER_STATUSES.map((status) => (
+                      <button
+                        key={status}
+                        type="button"
+                        className={`${styles.statusButton} ${styles[status]} ${selectedOrder.status === status ? styles.statusButtonActive : ''}`}
+                        onClick={() => onStatusChange?.(selectedOrder, status)}
+                        disabled={selectedOrderUpdating || selectedOrder.status === status}
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ) : null}
               <button type="button" className={styles.close} onClick={() => setSelectedSeatState({ layoutId, seat: '' })}>
                 Close

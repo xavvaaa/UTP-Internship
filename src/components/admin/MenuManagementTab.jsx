@@ -140,7 +140,6 @@ export default function MenuManagementTab({
     <div className={styles.container}>
       <div className={styles.header}>
         <div>
-          <h2 className={styles.title}>Menu Management</h2>
           <p className={styles.subtitle}>Manage meals and track stock levels.</p>
         </div>
         {!readOnly && (

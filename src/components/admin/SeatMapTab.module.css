@@ -635,7 +635,6 @@
   margin-top: 1rem;
 }
 
-.advanceButton,
 .close {
   width: 100%;
   min-height: 2.75rem;
@@ -647,18 +646,54 @@
   cursor: pointer;
 }
 
-.advanceButton {
-  background: var(--ifmod-accent);
-  color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.statusControls {
+  display: grid;
   gap: 0.45rem;
 }
 
-.advanceButton:disabled {
+.statusControlLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--ifmod-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.statusButtons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.statusButton {
+  min-height: 2.45rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  background: #fff;
+  color: var(--ifmod-text);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: capitalize;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.statusButton:hover:not(:disabled) {
+  border-color: var(--ifmod-accent);
+  box-shadow: 0 0 0 3px rgba(24, 103, 154, 0.1);
+}
+
+.statusButton:disabled {
   cursor: not-allowed;
-  opacity: 0.64;
+}
+
+.statusButtonActive {
+  box-shadow: inset 0 0 0 1px currentColor;
 }
 
 .close {
@@ -666,7 +701,6 @@
   color: var(--ifmod-text);
 }
 
-.advanceButton:hover,
 .close:hover {
   filter: brightness(0.95);
 }
