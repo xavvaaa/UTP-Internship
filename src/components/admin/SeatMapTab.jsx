@@ -5,13 +5,15 @@ import { getNextOrderStatus } from '../../services/admin/ordersAdminService'
 import styles from './SeatMapTab.module.css'
 
 export default function SeatMapTab({ orders, menuItems, session, updatingOrderId, onAdvance }) {
+  const layoutId = session?.seat_layout_id || DEFAULT_SEAT_LAYOUT_ID
   const [showDetails, setShowDetails] = useState(false)
-  const [selectedSeat, setSelectedSeat] = useState('')
+  const [selectedSeatState, setSelectedSeatState] = useState({ layoutId, seat: '' })
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [mealFilter, setMealFilter] = useState('all')
   const [cabinFilter, setCabinFilter] = useState('all')
-  const layout = getSeatLayout(session?.seat_layout_id || DEFAULT_SEAT_LAYOUT_ID)
+  const layout = getSeatLayout(layoutId)
+  const selectedSeat = selectedSeatState?.layoutId === layoutId ? selectedSeatState.seat : ''
   const maxSections = Math.max(...layout.cabins.flatMap((cabin) => cabin.rows.map((row) => row.sections.length)))
   const maxSeatsPerSection = Array.from({ length: maxSections }, (_value, index) =>
     Math.max(...layout.cabins.flatMap((cabin) => cabin.rows.map((row) => row.sections[index]?.length || 0))),
@@ -78,7 +80,7 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
         key={seat}
         type="button"
         className={`${styles.seat} ${styles[status] || ''} ${isBusiness ? styles.businessSeat : ''} ${isSelected ? styles.selectedSeat : ''} ${!matchesFilters ? styles.dimmedSeat : ''}`}
-        onClick={() => setSelectedSeat(seat)}
+        onClick={() => setSelectedSeatState({ layoutId, seat })}
         title={order ? `${seat} - ${order.meal || 'Order'} - ${status}` : `${seat} - no order`}
       >
         {order?.meal ? (
@@ -145,11 +147,11 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
   return (
     <section className={styles.wrap}>
       <div className={styles.toolbar}>
-        <div>
-          <h2 className={styles.title}>Cabin Layout</h2>
-          <p className={styles.subtitle}>
-            {layout.name} ({layout.aircraftType}) - {layout.description}
-          </p>
+        <div className={styles.aircraftSummary}>
+          <span className={styles.aircraftName}>{layout.name}</span>
+          <span className={styles.aircraftMeta}>
+            {layout.aircraftType} · {layout.description}
+          </span>
         </div>
         <div className={styles.toolbarActions}>
           <span className={styles.liveBadge}>Live orders</span>
@@ -339,86 +341,88 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
       </div>
 
       {selectedSeatInfo ? (
-        <section className={styles.selectionPanel} aria-live="polite">
-          <div className={styles.selectionHeader}>
-            <div>
-              <h3 className={styles.selectionTitle}>Seat {selectedSeatInfo.seat}</h3>
-              <p className={styles.selectionSubtitle}>
-                {seatCabinMap.get(selectedSeatInfo.seat) || 'Cabin'} {selectedSeatInfo.status === 'empty' ? '- no active order' : '- passenger order'}
-              </p>
+        <div className={styles.modal} onClick={() => setSelectedSeatState({ layoutId, seat: '' })}>
+          <section className={styles.modalCard} aria-live="polite" onClick={(event) => event.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div>
+                <h3 className={styles.modalTitle}>Seat {selectedSeatInfo.seat}</h3>
+                <p className={styles.modalSubtitle}>
+                  {seatCabinMap.get(selectedSeatInfo.seat) || 'Cabin'} {selectedSeatInfo.status === 'empty' ? '- no active order' : '- passenger order'}
+                </p>
+              </div>
+              <span className={`${styles.statusPill} ${styles[selectedSeatInfo.status]}`}>{selectedSeatInfo.status}</span>
             </div>
-            <span className={`${styles.statusPill} ${styles[selectedSeatInfo.status]}`}>{selectedSeatInfo.status}</span>
-          </div>
-          {selectedSeatInfo.status === 'empty' ? (
-            <p className={styles.emptyMessage}>No order for this seat.</p>
-          ) : (
-            <div className={styles.selectionBody}>
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Order ID:</span>
-                <span className={styles.detailValue}>#{selectedSeatInfo.orderId}</span>
-              </div>
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Flight ID:</span>
-                <span className={styles.detailValue}>{selectedSeatInfo.flightId || selectedSeatInfo.sessionId || 'N/A'}</span>
-              </div>
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Meal:</span>
-                <span className={styles.detailValueWithColor}>
-                  {selectedSeatInfo.meal ? (
-                    <span className={styles.mealColor} style={{ backgroundColor: getMealColor(selectedSeatInfo.meal) }}></span>
-                  ) : null}
-                  {selectedSeatInfo.meal || 'N/A'}
-                </span>
-              </div>
-              {selectedSeatInfo.drink && (
+            {selectedSeatInfo.status === 'empty' ? (
+              <p className={styles.emptyMessage}>No order for this seat.</p>
+            ) : (
+              <div className={styles.modalBody}>
                 <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Drink:</span>
-                  <span className={styles.detailValue}>{selectedSeatInfo.drink}</span>
+                  <span className={styles.detailLabel}>Order ID:</span>
+                  <span className={styles.detailValue}>#{selectedSeatInfo.orderId}</span>
                 </div>
-              )}
-              {selectedSeatInfo.dessert && (
                 <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Dessert:</span>
-                  <span className={styles.detailValue}>{selectedSeatInfo.dessert}</span>
+                  <span className={styles.detailLabel}>Flight ID:</span>
+                  <span className={styles.detailValue}>{selectedSeatInfo.flightId || selectedSeatInfo.sessionId || 'N/A'}</span>
                 </div>
-              )}
-              {selectedSeatInfo.snack && (
                 <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Snack:</span>
-                  <span className={styles.detailValue}>{selectedSeatInfo.snack}</span>
+                  <span className={styles.detailLabel}>Meal:</span>
+                  <span className={styles.detailValueWithColor}>
+                    {selectedSeatInfo.meal ? (
+                      <span className={styles.mealColor} style={{ backgroundColor: getMealColor(selectedSeatInfo.meal) }}></span>
+                    ) : null}
+                    {selectedSeatInfo.meal || 'N/A'}
+                  </span>
                 </div>
-              )}
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Updated:</span>
-                <span className={styles.detailValue}>{formatTime(selectedSeatInfo.updatedAt || selectedSeatInfo.timestamp)}</span>
-              </div>
-            </div>
-          )}
-          <div className={styles.selectionActions}>
-            {selectedOrder ? (
-              <button
-                type="button"
-                className={styles.advanceButton}
-                onClick={() => onAdvance?.(selectedOrder)}
-                disabled={!selectedNextStatus || updatingOrderId === selectedOrder.id}
-              >
-                {updatingOrderId === selectedOrder.id ? (
-                  <>
-                    <Loader2 size={16} className={styles.spin} />
-                    Updating...
-                  </>
-                ) : selectedNextStatus ? (
-                  `Mark as ${selectedNextStatus}`
-                ) : (
-                  'Delivered'
+                {selectedSeatInfo.drink && (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Drink:</span>
+                    <span className={styles.detailValue}>{selectedSeatInfo.drink}</span>
+                  </div>
                 )}
+                {selectedSeatInfo.dessert && (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Dessert:</span>
+                    <span className={styles.detailValue}>{selectedSeatInfo.dessert}</span>
+                  </div>
+                )}
+                {selectedSeatInfo.snack && (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Snack:</span>
+                    <span className={styles.detailValue}>{selectedSeatInfo.snack}</span>
+                  </div>
+                )}
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Updated:</span>
+                  <span className={styles.detailValue}>{formatTime(selectedSeatInfo.updatedAt || selectedSeatInfo.timestamp)}</span>
+                </div>
+              </div>
+            )}
+            <div className={styles.modalActions}>
+              {selectedOrder ? (
+                <button
+                  type="button"
+                  className={styles.advanceButton}
+                  onClick={() => onAdvance?.(selectedOrder)}
+                  disabled={!selectedNextStatus || updatingOrderId === selectedOrder.id}
+                >
+                  {updatingOrderId === selectedOrder.id ? (
+                    <>
+                      <Loader2 size={16} className={styles.spin} />
+                      Updating...
+                    </>
+                  ) : selectedNextStatus ? (
+                    `Mark as ${selectedNextStatus}`
+                  ) : (
+                    'Delivered'
+                  )}
+                </button>
+              ) : null}
+              <button type="button" className={styles.close} onClick={() => setSelectedSeatState({ layoutId, seat: '' })}>
+                Close
               </button>
-            ) : null}
-            <button type="button" className={styles.close} onClick={() => setSelectedSeat('')}>
-              Clear selection
-            </button>
-          </div>
-        </section>
+            </div>
+          </section>
+        </div>
       ) : null}
 
       {orderedMealOptions.length > 0 ? (
