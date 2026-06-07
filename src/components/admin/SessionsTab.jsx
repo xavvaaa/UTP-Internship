@@ -13,13 +13,14 @@ import {
   deleteSession,
   updateSession,
 } from '../../services/flightSessionService'
+import { DEFAULT_SEAT_LAYOUT_ID, SEAT_LAYOUTS, getSeatLayoutOption } from '../../data/seatLayouts'
 import styles from './SessionsTab.module.css'
 import ConfirmDialog from '../common/ConfirmDialog'
 import CrewAssignmentModal from './CrewAssignmentModal'
 
 export default function SessionsTab() {
   const { showSuccess, showError } = useToast()
-  const { activeSessionId, setActiveSessionId } = useSession()
+  const { activeSessionId, setActiveSessionId, setSessionData } = useSession()
 
   const [activeList, setActiveList] = useState([])
   const [endedList, setEndedList] = useState([])
@@ -50,6 +51,7 @@ export default function SessionsTab() {
     date: '',
     departure_time: '',
     route: '',
+    ...getSeatLayoutOption(DEFAULT_SEAT_LAYOUT_ID),
   })
 
   const [editFormData, setEditFormData] = useState({
@@ -57,6 +59,7 @@ export default function SessionsTab() {
     date: '',
     departure_time: '',
     route: '',
+    ...getSeatLayoutOption(DEFAULT_SEAT_LAYOUT_ID),
   })
 
   const fetchSummary = useCallback(async () => {
@@ -119,6 +122,7 @@ export default function SessionsTab() {
           date: '',
           departure_time: '',
           route: '',
+          ...getSeatLayoutOption(DEFAULT_SEAT_LAYOUT_ID),
         })
         setIsCreatePanelOpen(false)
         await fetchSummary()
@@ -190,6 +194,8 @@ export default function SessionsTab() {
       date: session.date || '',
       departure_time: session.departure_time || '',
       route: session.route || '',
+      aircraft_type: session.aircraft_type || getSeatLayoutOption(session.seat_layout_id).aircraft_type,
+      seat_layout_id: session.seat_layout_id || DEFAULT_SEAT_LAYOUT_ID,
     })
   }
 
@@ -202,6 +208,9 @@ export default function SessionsTab() {
       const result = await updateSession(editingSession.id, editFormData, token)
       if (result.ok) {
         showSuccess('Session updated')
+        if (activeSessionId === editingSession.id) {
+          setSessionData(result.session)
+        }
         setEditingSession(null)
         await fetchSummary()
       } else {
@@ -320,6 +329,8 @@ export default function SessionsTab() {
       const hay = [
         session.flight_number,
         session.route,
+        session.aircraft_type,
+        session.seat_layout_id,
         session.date,
         session.departure_time,
         session.access_code,
@@ -417,6 +428,12 @@ export default function SessionsTab() {
                 <span className={styles.metaItem}>
                   <span className={styles.metaLabel}>Code</span>
                   <span className={styles.metaValue}>{session.access_code}</span>
+                </span>
+              )}
+              {session.aircraft_type && (
+                <span className={styles.metaItem}>
+                  <span className={styles.metaLabel}>Aircraft</span>
+                  <span className={styles.metaValue}>{session.aircraft_type}</span>
                 </span>
               )}
               {session.expires_at && (
@@ -651,7 +668,7 @@ export default function SessionsTab() {
                     {currentSession.flight_number}
                   </div>
                   <div className={styles.currentSessionRoute}>
-                    {currentSession.route || 'Route not set'}
+                    {[currentSession.route || 'Route not set', currentSession.aircraft_type].filter(Boolean).join(' - ')}
                   </div>
                 </div>
                 {currentSession.access_code && (
@@ -966,6 +983,34 @@ export default function SessionsTab() {
                   </div>
                 </div>
 
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Aircraft layout</label>
+                    <select
+                      value={formData.seat_layout_id}
+                      onChange={(e) => setFormData({ ...formData, ...getSeatLayoutOption(e.target.value) })}
+                      className={styles.input}
+                      disabled={creating}
+                    >
+                      {SEAT_LAYOUTS.map((layout) => (
+                        <option key={layout.id} value={layout.id}>
+                          {layout.name} - {layout.description}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Aircraft type</label>
+                    <input
+                      type="text"
+                      value={formData.aircraft_type}
+                      onChange={(e) => setFormData({ ...formData, aircraft_type: e.target.value.toUpperCase() })}
+                      className={styles.input}
+                      disabled={creating}
+                    />
+                  </div>
+                </div>
+
                 <div className={styles.formFooter}>
                   <button type="submit" className={styles.submitBtn} disabled={creating}>
                     {creating ? 'Creating...' : 'Create session'}
@@ -1006,6 +1051,14 @@ export default function SessionsTab() {
               <div className={styles.detailGroup}>
                 <label>Route:</label>
                 <span>{showDetails.route}</span>
+              </div>
+              <div className={styles.detailGroup}>
+                <label>Aircraft:</label>
+                <span>{showDetails.aircraft_type || 'A320'}</span>
+              </div>
+              <div className={styles.detailGroup}>
+                <label>Seat Layout:</label>
+                <span>{showDetails.seat_layout_id || DEFAULT_SEAT_LAYOUT_ID}</span>
               </div>
               <div className={styles.detailGroup}>
                 <label>Access Code:</label>
@@ -1123,6 +1176,28 @@ export default function SessionsTab() {
                   value={editFormData.route}
                   onChange={(e) => setEditFormData({...editFormData, route: e.target.value})}
                   placeholder="e.g., KUL-LHR"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Aircraft Layout</label>
+                <select
+                  value={editFormData.seat_layout_id}
+                  onChange={(e) => setEditFormData({ ...editFormData, ...getSeatLayoutOption(e.target.value) })}
+                >
+                  {SEAT_LAYOUTS.map((layout) => (
+                    <option key={layout.id} value={layout.id}>
+                      {layout.name} - {layout.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label>Aircraft Type</label>
+                <input
+                  type="text"
+                  value={editFormData.aircraft_type}
+                  onChange={(e) => setEditFormData({...editFormData, aircraft_type: e.target.value.toUpperCase()})}
+                  placeholder="e.g., A320"
                 />
               </div>
             </form>

@@ -6,6 +6,8 @@ import { FieldValue } from 'firebase-admin/firestore'
 import { adminDb, adminAuth } from '../firebaseAdmin.js'
 
 const COLLECTION = 'flight_sessions'
+const DEFAULT_SEAT_LAYOUT_ID = 'a320_180'
+const DEFAULT_AIRCRAFT_TYPE = 'A320'
 
 function formatDateForQuery(date) {
   if (!date) return null
@@ -177,6 +179,8 @@ function safeSessionPayload(id, data) {
     date: data.date ?? null,
     departure_time: data.departure_time ?? null,
     route: data.route ?? null,
+    aircraft_type: data.aircraft_type ?? DEFAULT_AIRCRAFT_TYPE,
+    seat_layout_id: data.seat_layout_id ?? DEFAULT_SEAT_LAYOUT_ID,
     expires_at: data.expires_at ?? null,
     status: data.status ?? null,
     occupied_seats: data.occupied_seats ?? [],
@@ -379,7 +383,7 @@ export async function joinPassenger(req, res) {
  */
 export async function createSession(req, res) {
   try {
-    const { flight_number, date, departure_time, route, assigned_crew_ids } = req.body ?? {}
+    const { flight_number, date, departure_time, route, aircraft_type, seat_layout_id, assigned_crew_ids } = req.body ?? {}
 
     if (!flight_number?.trim()) {
       return res.status(400).json({ error: 'flight_number is required' })
@@ -420,6 +424,8 @@ export async function createSession(req, res) {
         date: normalizedDate,
         departure_time: departure_time.trim(),
         route: route?.trim() || null,
+        aircraft_type: aircraft_type?.trim() || DEFAULT_AIRCRAFT_TYPE,
+        seat_layout_id: seat_layout_id?.trim() || DEFAULT_SEAT_LAYOUT_ID,
         access_code,
         expires_at: expiresAt,
         status: 'active',
@@ -592,7 +598,7 @@ export async function endSession(req, res) {
 export async function updateSession(req, res) {
   try {
     const { id } = req.params
-    const { flight_number, date, departure_time, route, assigned_crew_ids } = req.body ?? {}
+    const { flight_number, date, departure_time, route, aircraft_type, seat_layout_id, assigned_crew_ids } = req.body ?? {}
 
     if (!id?.trim()) {
       return res.status(400).json({ error: 'session id is required' })
@@ -644,6 +650,12 @@ export async function updateSession(req, res) {
     }
     if (route !== undefined) {
       updateData.route = route?.trim() || null
+    }
+    if (aircraft_type !== undefined) {
+      updateData.aircraft_type = aircraft_type?.trim() || DEFAULT_AIRCRAFT_TYPE
+    }
+    if (seat_layout_id !== undefined) {
+      updateData.seat_layout_id = seat_layout_id?.trim() || DEFAULT_SEAT_LAYOUT_ID
     }
     if (assigned_crew_ids !== undefined) {
       updateData.assigned_crew_ids = Array.isArray(assigned_crew_ids) ? assigned_crew_ids : []

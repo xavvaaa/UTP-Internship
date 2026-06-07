@@ -8,6 +8,7 @@ import { useSession } from '../context/useSession'
 import { useToast } from '../context/useToast'
 import { getAuthToken } from '../utils/authToken'
 import { getSessionSummary, createSession, lookupFlightRoute } from '../services/flightSessionService'
+import { DEFAULT_SEAT_LAYOUT_ID, SEAT_LAYOUTS, getSeatLayoutOption } from '../data/seatLayouts'
 import SessionConfirmModal from '../components/common/SessionConfirmModal'
 import styles from './AdminSessionSelectionPage.module.css'
 
@@ -29,6 +30,7 @@ export default function AdminSessionSelectionPage() {
     date: '',
     departure_time: '',
     route: '',
+    ...getSeatLayoutOption(DEFAULT_SEAT_LAYOUT_ID),
   })
 
   useEffect(() => {
@@ -80,6 +82,7 @@ export default function AdminSessionSelectionPage() {
           date: '',
           departure_time: '',
           route: '',
+          ...getSeatLayoutOption(DEFAULT_SEAT_LAYOUT_ID),
         })
         setShowCreateForm(false)
       } else {
@@ -287,6 +290,35 @@ export default function AdminSessionSelectionPage() {
                   />
                 </label>
               </div>
+
+              <div className={styles.formRow}>
+                <label className={styles.label}>
+                  Aircraft layout
+                  <select
+                    value={formData.seat_layout_id}
+                    onChange={(e) => setFormData({ ...formData, ...getSeatLayoutOption(e.target.value) })}
+                    className={styles.input}
+                    disabled={creating}
+                  >
+                    {SEAT_LAYOUTS.map((layout) => (
+                      <option key={layout.id} value={layout.id}>
+                        {layout.name} - {layout.description}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className={styles.label}>
+                  Aircraft type
+                  <input
+                    type="text"
+                    value={formData.aircraft_type}
+                    onChange={(e) => setFormData({ ...formData, aircraft_type: e.target.value.toUpperCase() })}
+                    className={styles.input}
+                    disabled={creating}
+                  />
+                </label>
+              </div>
               
               <div className={styles.buttonRow}>
                 <button
@@ -427,6 +459,9 @@ export default function AdminSessionSelectionPage() {
                         )}
                         {session.route && (
                           <span className={styles.sessionPickTag}>{session.route}</span>
+                        )}
+                        {session.aircraft_type && (
+                          <span className={styles.sessionPickTag}>{session.aircraft_type}</span>
                         )}
                         {session.access_code && (
                           <span className={styles.sessionPickTag}>Code: {session.access_code}</span>

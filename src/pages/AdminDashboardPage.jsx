@@ -31,7 +31,7 @@ export default function AdminDashboardPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { role, flightId } = useAuth()
-  const { sessionId: flightInstanceId, flightNumber, activeSessionId } = useSession()
+  const { sessionId: flightInstanceId, flightNumber, activeSessionId, sessionData } = useSession()
   const { showSuccess, showError } = useToast()
 
   const isAssignedToActiveFlight =
@@ -327,7 +327,7 @@ export default function AdminDashboardPage() {
           />
         )}
 
-        {activeTab === 'seatmap' && <SeatMapTab orders={orders} menuItems={menuItems} />}
+        {activeTab === 'seatmap' && <SeatMapTab orders={orders} menuItems={menuItems} session={sessionData} />}
 
         {activeTab === 'menu' && (isAssignedToActiveFlight || role === 'admin') && (
           <MenuManagementTab

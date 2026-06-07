@@ -36,6 +36,7 @@ export default function SessionConfirmModal({
                 <span className={styles.time}>{session.departure_time}</span>
               )}
               {session.route && <span className={styles.route}>{session.route}</span>}
+              {session.aircraft_type && <span className={styles.route}>{session.aircraft_type}</span>}
             </div>
           </div>
 
