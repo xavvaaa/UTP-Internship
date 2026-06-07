@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { CheckCircle2, Loader2, Pencil, Trash2, Upload, Plus, Package, AlertTriangle } from 'lucide-react'
+import { CheckCircle2, Loader2, Pencil, Trash2, Upload, Plus, AlertTriangle, X } from 'lucide-react'
 import { useToast } from '../../context/useToast'
 import styles from './MenuManagementTab.module.css'
 
@@ -33,6 +33,7 @@ export default function MenuManagementTab({
   const [searchQuery, setSearchQuery] = useState('')
   const [stockFilter, setStockFilter] = useState('all')
   const [sortMode, setSortMode] = useState('name')
+  const [activeOptionTab, setActiveOptionTab] = useState('drink')
   const [newOption, setNewOption] = useState({ drink: '', dessert: '', snack: '', allergen: '' })
 
   const meals = useMemo(
@@ -48,6 +49,41 @@ export default function MenuManagementTab({
   )
 
   const readOnly = role !== 'admin'
+  const optionTabs = [
+    {
+      id: 'drink',
+      title: 'Drinks',
+      subtitle: 'Add drinks passengers can choose with this meal.',
+      placeholder: 'Add a drink option',
+      buttonLabel: 'Add drink',
+      options: form.drinkOptions,
+    },
+    {
+      id: 'dessert',
+      title: 'Desserts',
+      subtitle: 'Add desserts passengers can choose with this meal.',
+      placeholder: 'Add a dessert option',
+      buttonLabel: 'Add dessert',
+      options: form.dessertOptions,
+    },
+    {
+      id: 'snack',
+      title: 'Snacks',
+      subtitle: 'Add snacks passengers can choose with this meal.',
+      placeholder: 'Add a snack option',
+      buttonLabel: 'Add snack',
+      options: form.snackOptions,
+    },
+    {
+      id: 'allergen',
+      title: 'Allergens',
+      subtitle: 'List allergens so passengers can avoid this meal if needed.',
+      placeholder: 'Add an allergen',
+      buttonLabel: 'Add allergen',
+      options: form.allergens,
+    },
+  ]
+  const activeOption = optionTabs.find((tab) => tab.id === activeOptionTab) || optionTabs[0]
 
   const menuStats = useMemo(() => {
     const initial = { total: meals.length, available: 0, low: 0, out: 0, totalStock: 0 }
@@ -100,6 +136,7 @@ export default function MenuManagementTab({
     setForm(EMPTY_FORM)
 
     setNewOption({ drink: '', dessert: '', snack: '' })
+    setActiveOptionTab('drink')
     setShowForm(false)
   }
 
@@ -124,6 +161,7 @@ export default function MenuManagementTab({
       lowStockThreshold: item.lowStockThreshold || 20,
     })
     setNewOption({ drink: '', dessert: '', snack: '', allergen: '' })
+    setActiveOptionTab('drink')
     setShowForm(true)
   }
 
@@ -373,7 +411,7 @@ export default function MenuManagementTab({
                 onClick={resetForm}
                 title="Close form"
               >
-                ×
+                <X size={18} />
               </button>
             </div>
 
@@ -458,7 +496,7 @@ export default function MenuManagementTab({
                 </div>
 
                 {/* Stock Management Fields */}
-                <div className={styles.formGrid}>
+                <div className={styles.stockGrid} data-span="full">
                   <div className={styles.formField}>
                     <label className={styles.label}>
                       Stock Count
@@ -471,7 +509,7 @@ export default function MenuManagementTab({
                         disabled={readOnly}
                         min="0"
                       />
-                      <small>Current available quantity</small>
+                      <small className={styles.fieldHint}>Current available quantity</small>
                     </label>
                   </div>
 
@@ -487,7 +525,7 @@ export default function MenuManagementTab({
                         disabled={readOnly}
                         min="0"
                       />
-                      <small>Alert when stock drops below this level</small>
+                      <small className={styles.fieldHint}>Alert when stock drops below this level</small>
                     </label>
                   </div>
                 </div>
