@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { getFlightReport } from '../controllers/reportsController.js'
-import { requireAdminForActiveFlight, requireAuth, requireAdmin } from '../middleware/authz.js'
+import { requireAuth, requireAdmin } from '../middleware/authz.js'
 
 const reportsRoutes = Router()
 

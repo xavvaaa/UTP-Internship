@@ -132,15 +132,6 @@ export default function AdminDashboardPage() {
   }, [showError, flightInstanceId])
 
   const visibleOrders = useMemo(() => sortOrders(orders, sortMode), [orders, sortMode])
-  const summary = useMemo(
-    () => ({
-      total: orders.length,
-      pending: orders.filter((o) => o.status === 'pending').length,
-      preparing: orders.filter((o) => o.status === 'preparing').length,
-      delivered: orders.filter((o) => o.status === 'delivered').length,
-    }),
-    [orders],
-  )
 
   useEffect(() => {
     if (activeTab === 'reports' && isAdminForActiveFlight) {
@@ -281,30 +272,6 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Status Cards - Order-focused tabs only. */}
-      {activeTab !== 'settings' && activeTab !== 'seatmap' && activeTab !== 'sessions' && activeTab !== 'menu' && (
-        <div className={styles.statusOverview}>
-          <div className={styles.statusCards}>
-            <div className={styles.statusCard}>
-              <div className={styles.statusValue}>{summary.total}</div>
-              <div className={styles.statusLabel}>Total Orders</div>
-            </div>
-            <div className={styles.statusCard}>
-              <div className={styles.statusValue}>{summary.pending}</div>
-              <div className={styles.statusLabel}>Pending</div>
-            </div>
-            <div className={styles.statusCard}>
-              <div className={styles.statusValue}>{summary.preparing}</div>
-              <div className={styles.statusLabel}>Preparing</div>
-            </div>
-            <div className={styles.statusCard}>
-              <div className={styles.statusValue}>{summary.delivered}</div>
-              <div className={styles.statusLabel}>Delivered</div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {!isAssignedToActiveFlight && role === 'crew' && !flightInstanceId && (
         <div className={styles.statusAlert}>
           <AlertCircle size={18} />
@@ -357,7 +324,7 @@ export default function AdminDashboardPage() {
         {activeTab === 'sessions' && canManageSessions && <SessionsTab />}
 
         {activeTab === 'reports' && (isAdminForActiveFlight || role === 'admin') && (
-          <ReportsTab orders={orders} summary={reportSummary} onRefresh={loadReport} />
+          <ReportsTab orders={orders} menuItems={menuItems} summary={reportSummary} onRefresh={loadReport} />
         )}
 
         {activeTab === 'settings' && (role === 'admin' || role === 'crew') && <SettingsTab role={role} />}

@@ -146,19 +146,26 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
 
   return (
     <section className={styles.wrap}>
-      <div className={styles.toolbar}>
-        <div className={styles.aircraftSummary}>
-          <span className={styles.aircraftName}>{layout.name}</span>
-          <span className={styles.aircraftMeta}>
-            {layout.aircraftType} - {layout.description}
-          </span>
+      <div className={styles.overview} aria-label="Seat map order summary">
+        <div className={styles.metric}>
+          <span className={styles.metricValue}>{summary.total}</span>
+          <span className={styles.metricLabel}>Orders</span>
         </div>
-        <div className={styles.toolbarActions}>
-          <span className={styles.liveBadge}>Live orders</span>
-          <label className={styles.toggle}>
-            <input type="checkbox" checked={showDetails} onChange={(e) => setShowDetails(e.target.checked)} />
-            Order details
-          </label>
+        <div className={`${styles.metric} ${styles.pendingMetric}`}>
+          <span className={styles.metricValue}>{summary.pending}</span>
+          <span className={styles.metricLabel}>Pending</span>
+        </div>
+        <div className={`${styles.metric} ${styles.preparingMetric}`}>
+          <span className={styles.metricValue}>{summary.preparing}</span>
+          <span className={styles.metricLabel}>Preparing</span>
+        </div>
+        <div className={`${styles.metric} ${styles.deliveredMetric}`}>
+          <span className={styles.metricValue}>{summary.delivered}</span>
+          <span className={styles.metricLabel}>Delivered</span>
+        </div>
+        <div className={styles.metric}>
+          <span className={styles.metricValue}>{summary.empty}</span>
+          <span className={styles.metricLabel}>No order</span>
         </div>
       </div>
 
@@ -222,26 +229,19 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
         </div>
       ) : null}
 
-      <div className={styles.overview} aria-label="Seat map order summary">
-        <div className={styles.metric}>
-          <span className={styles.metricValue}>{summary.total}</span>
-          <span className={styles.metricLabel}>Orders</span>
+      <div className={styles.toolbar}>
+        <div className={styles.aircraftSummary}>
+          <span className={styles.aircraftName}>{layout.name}</span>
+          <span className={styles.aircraftMeta}>
+            {layout.aircraftType} - {layout.description}
+          </span>
         </div>
-        <div className={`${styles.metric} ${styles.pendingMetric}`}>
-          <span className={styles.metricValue}>{summary.pending}</span>
-          <span className={styles.metricLabel}>Pending</span>
-        </div>
-        <div className={`${styles.metric} ${styles.preparingMetric}`}>
-          <span className={styles.metricValue}>{summary.preparing}</span>
-          <span className={styles.metricLabel}>Preparing</span>
-        </div>
-        <div className={`${styles.metric} ${styles.deliveredMetric}`}>
-          <span className={styles.metricValue}>{summary.delivered}</span>
-          <span className={styles.metricLabel}>Delivered</span>
-        </div>
-        <div className={styles.metric}>
-          <span className={styles.metricValue}>{summary.empty}</span>
-          <span className={styles.metricLabel}>No order</span>
+        <div className={styles.toolbarActions}>
+          <span className={styles.liveBadge}>Live orders</span>
+          <label className={styles.toggle}>
+            <input type="checkbox" checked={showDetails} onChange={(e) => setShowDetails(e.target.checked)} />
+            Order details
+          </label>
         </div>
       </div>
 

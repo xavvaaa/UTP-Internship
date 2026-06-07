@@ -31,49 +31,6 @@
   align-items: center;
 }
 
-/* Status Overview */
-.statusOverview {
-  margin-bottom: 1.5rem;
-}
-
-.statusCards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.statusCard {
-  background: var(--ifmod-surface);
-  border: 1px solid var(--ifmod-border);
-  border-radius: 0.75rem;
-  padding: 1rem;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.statusCard:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.statusValue {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--ifmod-accent);
-  margin-bottom: 0.25rem;
-  line-height: 1;
-}
-
-.statusLabel {
-  font-size: 0.875rem;
-  color: var(--ifmod-muted);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-}
-
 /* Status Alert */
 .statusAlert {
   display: flex;
@@ -172,11 +129,6 @@
 
 /* Responsive Design */
 @media (max-width: 640px) {
-  .statusCards {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-  }
-
   .tabButton {
     padding: 0.5rem 0.625rem;
     font-size: 0.75rem;
@@ -190,10 +142,6 @@
 }
 
 @media (max-width: 480px) {
-  .statusCards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .tabList {
     gap: 0.125rem;
   }
