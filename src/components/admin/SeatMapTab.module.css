@@ -81,6 +81,73 @@
   gap: 0.75rem;
 }
 
+.controls {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1.4fr) repeat(3, minmax(9rem, 1fr)) auto;
+  gap: 0.75rem;
+  align-items: end;
+  padding: 1rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+  background: var(--ifmod-surface);
+}
+
+.searchBox,
+.filterControl {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--ifmod-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.searchBox input,
+.filterControl select {
+  width: 100%;
+  min-height: 2.5rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  background: #fff;
+  color: var(--ifmod-text);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0 0.75rem;
+}
+
+.searchBox input:focus,
+.filterControl select:focus {
+  outline: 2px solid rgba(24, 103, 154, 0.25);
+  border-color: var(--ifmod-accent);
+}
+
+.clearFilters {
+  min-height: 2.5rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  background: #fff;
+  color: var(--ifmod-text);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  padding: 0 0.85rem;
+  cursor: pointer;
+}
+
+.clearFilters:hover {
+  border-color: var(--ifmod-accent);
+}
+
+.filterSummary {
+  padding: 0.6rem 0.85rem;
+  border: 1px solid rgba(24, 103, 154, 0.18);
+  border-radius: 0.65rem;
+  background: rgba(24, 103, 154, 0.07);
+  color: var(--ifmod-muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
 .metric {
   min-height: 4.5rem;
   padding: 0.85rem 1rem;
@@ -262,6 +329,7 @@
 }
 
 .seat {
+  position: relative;
   min-height: 2.6rem;
   border: 1px solid var(--ifmod-border);
   border-radius: 0.55rem;
@@ -279,6 +347,7 @@
   font-weight: 800;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+  overflow: hidden;
 }
 
 .seat:hover {
@@ -295,11 +364,30 @@
 .seat strong {
   font-size: 0.82rem;
   line-height: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .businessSeat {
   border-color: rgba(180, 83, 9, 0.28);
   background: linear-gradient(180deg, #fff7ed, #fffbeb);
+}
+
+.selectedSeat {
+  border-color: var(--ifmod-accent);
+  box-shadow: 0 0 0 3px rgba(24, 103, 154, 0.16), 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+
+.dimmedSeat {
+  opacity: 0.28;
+}
+
+.mealStripe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.22rem;
 }
 
 .meta {
@@ -312,6 +400,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative;
+  z-index: 1;
 }
 
 .mealColor {
@@ -426,45 +516,33 @@
   color: var(--ifmod-accent);
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.selectionPanel {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.9fr) minmax(0, 2fr) minmax(12rem, 0.8fr);
+  gap: 1rem;
+  align-items: start;
   padding: 1rem;
-  background: rgba(15, 23, 42, 0.5);
-  animation: modalFadeIn 0.18s ease-out;
-}
-
-.modalCard {
-  width: min(32rem, 100%);
-  max-height: 90vh;
-  overflow-y: auto;
   border: 1px solid var(--ifmod-border);
   border-radius: 0.75rem;
   background: var(--ifmod-surface);
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
-  animation: modalSlideIn 0.22s ease-out;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
 }
 
-.modalHeader {
+.selectionHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.25rem 1.25rem 0;
 }
 
-.modalTitle {
+.selectionTitle {
   margin: 0;
   color: var(--ifmod-text);
   font-size: 1.2rem;
   font-weight: 800;
 }
 
-.modalSubtitle {
+.selectionSubtitle {
   margin: 0.2rem 0 0;
   color: var(--ifmod-muted);
   font-size: 0.84rem;
@@ -483,14 +561,10 @@
   text-transform: capitalize;
 }
 
-.modalContent {
-  padding: 1rem 1.25rem 1.25rem;
-}
-
-.modalDetails {
+.selectionBody {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.25rem;
-  margin-bottom: 1rem;
 }
 
 .detailRow {
@@ -520,49 +594,111 @@
   overflow-wrap: anywhere;
 }
 
+.detailValueWithColor {
+  min-width: 0;
+  color: var(--ifmod-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
 .emptyMessage {
-  margin: 1.4rem 0;
+  margin: 0.5rem 0;
   color: var(--ifmod-muted);
   text-align: center;
   font-weight: 600;
 }
 
+.selectionActions {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.advanceButton,
 .close {
   width: 100%;
   min-height: 2.75rem;
   border: 1px solid var(--ifmod-border);
   border-radius: 0.55rem;
-  background: var(--ifmod-accent);
-  color: #fff;
   font: inherit;
   font-size: 0.9rem;
   font-weight: 800;
   cursor: pointer;
 }
 
+.advanceButton {
+  background: var(--ifmod-accent);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.advanceButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.64;
+}
+
+.close {
+  background: #fff;
+  color: var(--ifmod-text);
+}
+
+.advanceButton:hover,
 .close:hover {
   filter: brightness(0.95);
 }
 
-@keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.spin {
+  animation: spin 0.8s linear infinite;
 }
 
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.mealLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+  background: var(--ifmod-surface);
+}
+
+.mealLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 1.85rem;
+  padding: 0 0.65rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 999px;
+  color: var(--ifmod-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 900px) {
   .overview {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .selectionPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .selectionBody {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -577,6 +713,10 @@
   }
 
   .overview {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
     grid-template-columns: 1fr;
   }
 

@@ -327,7 +327,15 @@ export default function AdminDashboardPage() {
           />
         )}
 
-        {activeTab === 'seatmap' && <SeatMapTab orders={orders} menuItems={menuItems} session={sessionData} />}
+        {activeTab === 'seatmap' && (
+          <SeatMapTab
+            orders={orders}
+            menuItems={menuItems}
+            session={sessionData}
+            updatingOrderId={updatingOrderId}
+            onAdvance={handleAdvance}
+          />
+        )}
 
         {activeTab === 'menu' && (isAssignedToActiveFlight || role === 'admin') && (
           <MenuManagementTab

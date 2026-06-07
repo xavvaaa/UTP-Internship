@@ -1,10 +1,16 @@
 import { useMemo, useState } from 'react'
+import { Loader2 } from 'lucide-react'
 import { DEFAULT_SEAT_LAYOUT_ID, getSeatLayout } from '../../data/seatLayouts'
+import { getNextOrderStatus } from '../../services/admin/ordersAdminService'
 import styles from './SeatMapTab.module.css'
 
-export default function SeatMapTab({ orders, menuItems, session }) {
+export default function SeatMapTab({ orders, menuItems, session, updatingOrderId, onAdvance }) {
   const [showDetails, setShowDetails] = useState(false)
-  const [selectedOrder, setSelectedOrder] = useState(null)
+  const [selectedSeat, setSelectedSeat] = useState('')
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [mealFilter, setMealFilter] = useState('all')
+  const [cabinFilter, setCabinFilter] = useState('all')
   const layout = getSeatLayout(session?.seat_layout_id || DEFAULT_SEAT_LAYOUT_ID)
   const maxSections = Math.max(...layout.cabins.flatMap((cabin) => cabin.rows.map((row) => row.sections.length)))
   const maxSeatsPerSection = Array.from({ length: maxSections }, (_value, index) =>
@@ -12,14 +18,26 @@ export default function SeatMapTab({ orders, menuItems, session }) {
   )
   const seatGridTemplateColumns = buildSeatGridColumns(maxSeatsPerSection)
   const sectionLabels = buildSectionLabels(layout, maxSections)
-  const totalSeats = useMemo(
+  const cabinOptions = layout.cabins.map((cabin) => cabin.name)
+  const orderedMealOptions = useMemo(
     () =>
-      layout.cabins.reduce(
-        (sum, cabin) => sum + cabin.rows.reduce((rowSum, row) => rowSum + row.sections.flat().length, 0),
-        0,
+      Array.from(new Set(orders.map((order) => order.meal).filter(Boolean))).sort((a, b) =>
+        a.localeCompare(b),
       ),
-    [layout],
+    [orders],
   )
+  const totalSeats = layout.cabins.reduce(
+    (sum, cabin) => sum + cabin.rows.reduce((rowSum, row) => rowSum + row.sections.flat().length, 0),
+    0,
+  )
+  const seatCabinMap = new Map()
+  for (const cabin of layout.cabins) {
+    for (const row of cabin.rows) {
+      for (const col of row.sections.flat()) {
+        seatCabinMap.set(`${row.number}${col}`, cabin.name)
+      }
+    }
+  }
 
   const seatMap = useMemo(() => {
     const map = new Map()
@@ -29,16 +47,22 @@ export default function SeatMapTab({ orders, menuItems, session }) {
     return map
   }, [orders])
 
-  const summary = useMemo(
-    () => ({
-      total: orders.length,
-      empty: Math.max(0, totalSeats - orders.length),
-      pending: orders.filter((order) => order.status === 'pending').length,
-      preparing: orders.filter((order) => order.status === 'preparing').length,
-      delivered: orders.filter((order) => order.status === 'delivered').length,
-    }),
-    [orders, totalSeats],
-  )
+  const selectedOrder = selectedSeat ? seatMap.get(selectedSeat) || null : null
+  const selectedSeatInfo = selectedSeat
+    ? { ...(selectedOrder || {}), seat: selectedSeat, status: selectedOrder?.status || 'empty' }
+    : null
+  const selectedNextStatus = selectedOrder ? getNextOrderStatus(selectedOrder.status) : null
+
+  const summary = {
+    total: orders.length,
+    empty: Math.max(0, totalSeats - orders.length),
+    pending: orders.filter((order) => order.status === 'pending').length,
+    preparing: orders.filter((order) => order.status === 'preparing').length,
+    delivered: orders.filter((order) => order.status === 'delivered').length,
+  }
+
+  const filteredOrderCount = orders.filter((order) => seatMatchesFilters(order.seatNumber, order)).length
+  const filtersActive = search.trim() || statusFilter !== 'all' || mealFilter !== 'all' || cabinFilter !== 'all'
 
   const getMealColor = (mealName) => {
     const meal = menuItems?.find(item => item.name === mealName)
@@ -47,13 +71,19 @@ export default function SeatMapTab({ orders, menuItems, session }) {
 
   const renderSeatButton = (seat, order, isBusiness) => {
     const status = order?.status || 'empty'
+    const matchesFilters = seatMatchesFilters(seat, order)
+    const isSelected = selectedSeat === seat
     return (
       <button
         key={seat}
         type="button"
-        className={`${styles.seat} ${styles[status] || ''} ${isBusiness ? styles.businessSeat : ''}`}
-        onClick={() => setSelectedOrder(order ? { ...order, seat } : { seat, status: 'empty' })}
+        className={`${styles.seat} ${styles[status] || ''} ${isBusiness ? styles.businessSeat : ''} ${isSelected ? styles.selectedSeat : ''} ${!matchesFilters ? styles.dimmedSeat : ''}`}
+        onClick={() => setSelectedSeat(seat)}
+        title={order ? `${seat} - ${order.meal || 'Order'} - ${status}` : `${seat} - no order`}
       >
+        {order?.meal ? (
+          <span className={styles.mealStripe} style={{ backgroundColor: getMealColor(order.meal) }}></span>
+        ) : null}
         <strong>{seat}</strong>
         {showDetails && order ? (
           <span className={styles.meta}>
@@ -63,6 +93,33 @@ export default function SeatMapTab({ orders, menuItems, session }) {
         ) : null}
       </button>
     )
+  }
+
+  function seatMatchesFilters(seat, order) {
+    const query = search.trim().toUpperCase()
+    const cabin = seatCabinMap.get(String(seat ?? '').toUpperCase()) || ''
+    const status = order?.status || 'empty'
+
+    if (statusFilter !== 'all' && status !== statusFilter) return false
+    if (mealFilter !== 'all' && order?.meal !== mealFilter) return false
+    if (cabinFilter !== 'all' && cabin !== cabinFilter) return false
+    if (!query) return true
+
+    const searchable = [
+      seat,
+      order?.orderId,
+      order?.meal,
+      order?.drink,
+      order?.dessert,
+      order?.snack,
+      status,
+      cabin,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toUpperCase()
+
+    return searchable.includes(query)
   }
 
   const renderSeatRow = (row, isBusiness = false) => (
@@ -102,6 +159,66 @@ export default function SeatMapTab({ orders, menuItems, session }) {
           </label>
         </div>
       </div>
+
+      <div className={styles.controls} aria-label="Seat map filters">
+        <label className={styles.searchBox}>
+          <span>Find</span>
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Seat, order, meal"
+          />
+        </label>
+        <label className={styles.filterControl}>
+          <span>Status</span>
+          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+            <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="preparing">Preparing</option>
+            <option value="delivered">Delivered</option>
+            <option value="empty">No order</option>
+          </select>
+        </label>
+        <label className={styles.filterControl}>
+          <span>Meal</span>
+          <select value={mealFilter} onChange={(event) => setMealFilter(event.target.value)}>
+            <option value="all">All meals</option>
+            {orderedMealOptions.map((meal) => (
+              <option key={meal} value={meal}>{meal}</option>
+            ))}
+          </select>
+        </label>
+        <label className={styles.filterControl}>
+          <span>Cabin</span>
+          <select value={cabinFilter} onChange={(event) => setCabinFilter(event.target.value)}>
+            <option value="all">All cabins</option>
+            {cabinOptions.map((cabin) => (
+              <option key={cabin} value={cabin}>{cabin}</option>
+            ))}
+          </select>
+        </label>
+        {filtersActive ? (
+          <button
+            type="button"
+            className={styles.clearFilters}
+            onClick={() => {
+              setSearch('')
+              setStatusFilter('all')
+              setMealFilter('all')
+              setCabinFilter('all')
+            }}
+          >
+            Clear
+          </button>
+        ) : null}
+      </div>
+
+      {filtersActive ? (
+        <div className={styles.filterSummary}>
+          Showing {filteredOrderCount} matching orders. Non-matching seats are dimmed.
+        </div>
+      ) : null}
 
       <div className={styles.overview} aria-label="Seat map order summary">
         <div className={styles.metric}>
@@ -207,7 +324,7 @@ export default function SeatMapTab({ orders, menuItems, session }) {
               <span className={styles.galleyLabel}>Galley</span>
             </div>
           </div>
-          
+
           {/* Back of Plane Label */}
           <div className={styles.backPlaneLabel}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
@@ -220,64 +337,100 @@ export default function SeatMapTab({ orders, menuItems, session }) {
           </div>
         </div>
       </div>
-      {selectedOrder && (
-        <div className={styles.modal} onClick={() => setSelectedOrder(null)}>
-          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <div>
-                <h3 className={styles.modalTitle}>Seat {selectedOrder.seat}</h3>
-                <p className={styles.modalSubtitle}>{selectedOrder.status === 'empty' ? 'No active order' : 'Passenger order'}</p>
-              </div>
-              <span className={`${styles.statusPill} ${styles[selectedOrder.status]}`}>{selectedOrder.status}</span>
+
+      {selectedSeatInfo ? (
+        <section className={styles.selectionPanel} aria-live="polite">
+          <div className={styles.selectionHeader}>
+            <div>
+              <h3 className={styles.selectionTitle}>Seat {selectedSeatInfo.seat}</h3>
+              <p className={styles.selectionSubtitle}>
+                {seatCabinMap.get(selectedSeatInfo.seat) || 'Cabin'} {selectedSeatInfo.status === 'empty' ? '- no active order' : '- passenger order'}
+              </p>
             </div>
-            <div className={styles.modalContent}>
-              {selectedOrder.status === 'empty' ? (
-                <p className={styles.emptyMessage}>No order for this seat.</p>
-              ) : (
-                <div className={styles.modalDetails}>
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Order ID:</span>
-                    <span className={styles.detailValue}>#{selectedOrder.orderId}</span>
-                  </div>
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Flight ID:</span>
-                    <span className={styles.detailValue}>{selectedOrder.flightId || selectedOrder.sessionId || 'N/A'}</span>
-                  </div>
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Meal:</span>
-                    <span className={styles.detailValue}>{selectedOrder.meal || 'N/A'}</span>
-                  </div>
-                  {selectedOrder.drink && (
-                    <div className={styles.detailRow}>
-                      <span className={styles.detailLabel}>Drink:</span>
-                      <span className={styles.detailValue}>{selectedOrder.drink}</span>
-                    </div>
-                  )}
-                  {selectedOrder.dessert && (
-                    <div className={styles.detailRow}>
-                      <span className={styles.detailLabel}>Dessert:</span>
-                      <span className={styles.detailValue}>{selectedOrder.dessert}</span>
-                    </div>
-                  )}
-                  {selectedOrder.snack && (
-                    <div className={styles.detailRow}>
-                      <span className={styles.detailLabel}>Snack:</span>
-                      <span className={styles.detailValue}>{selectedOrder.snack}</span>
-                    </div>
-                  )}
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Updated:</span>
-                    <span className={styles.detailValue}>{formatTime(selectedOrder.updatedAt || selectedOrder.timestamp)}</span>
-                  </div>
+            <span className={`${styles.statusPill} ${styles[selectedSeatInfo.status]}`}>{selectedSeatInfo.status}</span>
+          </div>
+          {selectedSeatInfo.status === 'empty' ? (
+            <p className={styles.emptyMessage}>No order for this seat.</p>
+          ) : (
+            <div className={styles.selectionBody}>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>Order ID:</span>
+                <span className={styles.detailValue}>#{selectedSeatInfo.orderId}</span>
+              </div>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>Flight ID:</span>
+                <span className={styles.detailValue}>{selectedSeatInfo.flightId || selectedSeatInfo.sessionId || 'N/A'}</span>
+              </div>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>Meal:</span>
+                <span className={styles.detailValueWithColor}>
+                  {selectedSeatInfo.meal ? (
+                    <span className={styles.mealColor} style={{ backgroundColor: getMealColor(selectedSeatInfo.meal) }}></span>
+                  ) : null}
+                  {selectedSeatInfo.meal || 'N/A'}
+                </span>
+              </div>
+              {selectedSeatInfo.drink && (
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Drink:</span>
+                  <span className={styles.detailValue}>{selectedSeatInfo.drink}</span>
                 </div>
               )}
-              <button type="button" className={styles.close} onClick={() => setSelectedOrder(null)}>
-                Close
-              </button>
+              {selectedSeatInfo.dessert && (
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Dessert:</span>
+                  <span className={styles.detailValue}>{selectedSeatInfo.dessert}</span>
+                </div>
+              )}
+              {selectedSeatInfo.snack && (
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Snack:</span>
+                  <span className={styles.detailValue}>{selectedSeatInfo.snack}</span>
+                </div>
+              )}
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>Updated:</span>
+                <span className={styles.detailValue}>{formatTime(selectedSeatInfo.updatedAt || selectedSeatInfo.timestamp)}</span>
+              </div>
             </div>
+          )}
+          <div className={styles.selectionActions}>
+            {selectedOrder ? (
+              <button
+                type="button"
+                className={styles.advanceButton}
+                onClick={() => onAdvance?.(selectedOrder)}
+                disabled={!selectedNextStatus || updatingOrderId === selectedOrder.id}
+              >
+                {updatingOrderId === selectedOrder.id ? (
+                  <>
+                    <Loader2 size={16} className={styles.spin} />
+                    Updating...
+                  </>
+                ) : selectedNextStatus ? (
+                  `Mark as ${selectedNextStatus}`
+                ) : (
+                  'Delivered'
+                )}
+              </button>
+            ) : null}
+            <button type="button" className={styles.close} onClick={() => setSelectedSeat('')}>
+              Clear selection
+            </button>
           </div>
+        </section>
+      ) : null}
+
+      {orderedMealOptions.length > 0 ? (
+        <div className={styles.mealLegend} aria-label="Meal color legend">
+          {orderedMealOptions.map((meal) => (
+            <span key={meal} className={styles.mealLegendItem}>
+              <span className={styles.mealColor} style={{ backgroundColor: getMealColor(meal) }}></span>
+              {meal}
+            </span>
+          ))}
         </div>
-      )}
+      ) : null}
     </section>
   )
 }
