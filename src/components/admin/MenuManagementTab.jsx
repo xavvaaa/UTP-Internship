@@ -417,19 +417,88 @@ export default function MenuManagementTab({
 
             <form className={styles.form} onSubmit={handleSubmit}>
               <div className={styles.formGrid}>
-                <div className={styles.formField}>
-                  <label className={styles.label}>
-                    Meal name *
-                    <input
-                      type="text"
-                      className={styles.input}
-                      value={form.name}
-                      onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Enter meal name"
-                      required
-                      disabled={readOnly}
-                    />
+                <div className={styles.mealIdentity} data-span="full">
+                  <label className={styles.imageField}>
+                    <span className={styles.identityLabel}>Meal image</span>
+                    <div
+                      className={`${styles.imagePicker} ${form.imageUrl ? styles.hasImage : ''}`}
+                    >
+                      {form.imageUrl ? (
+                        <img src={form.imageUrl} alt="Meal preview" />
+                      ) : (
+                        <div className={styles.imagePlaceholder}>
+                          <Upload size={22} />
+                          <span>Add image</span>
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleUpload}
+                        disabled={readOnly || uploading}
+                        className={styles.fileInput}
+                        aria-label="Choose meal image"
+                      />
+                      {form.imageUrl && !readOnly && (
+                        <span className={styles.changeImage}>
+                          <Upload size={14} />
+                          {uploading ? 'Uploading...' : 'Change'}
+                        </span>
+                      )}
+                    </div>
+                    {uploading && !form.imageUrl && (
+                      <span className={styles.uploadStatus}>Uploading...</span>
+                    )}
                   </label>
+
+                  <div className={styles.identityDetails}>
+                    <div className={styles.identityControls}>
+                      <label className={styles.label}>
+                        Meal name *
+                        <input
+                          type="text"
+                          className={styles.input}
+                          value={form.name}
+                          onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="Enter meal name"
+                          required
+                          disabled={readOnly}
+                        />
+                      </label>
+
+                      <label className={styles.compactColorField}>
+                        <span>Meal color</span>
+                        <div className={styles.compactColorControl}>
+                          <span
+                            className={styles.colorSwatch}
+                            style={{ backgroundColor: form.color || '#3b82f6' }}
+                            aria-hidden="true"
+                          />
+                          <input
+                            type="color"
+                            className={styles.compactColorPicker}
+                            value={form.color || '#3b82f6'}
+                            onChange={(e) => setForm(prev => ({ ...prev, color: e.target.value }))}
+                            disabled={readOnly}
+                            aria-label="Choose meal color"
+                          />
+                          <input
+                            type="text"
+                            className={styles.compactColorInput}
+                            value={form.color || '#3b82f6'}
+                            onChange={(e) => setForm(prev => ({ ...prev, color: e.target.value }))}
+                            placeholder="#3b82f6"
+                            disabled={readOnly}
+                            pattern="^#[0-9A-Fa-f]{6}$"
+                            aria-label="Meal color hex value"
+                          />
+                        </div>
+                      </label>
+                    </div>
+                    <p className={styles.identityHint}>
+                      The color is used as a quick visual identifier across the menu.
+                    </p>
+                  </div>
                 </div>
 
                 <div className={styles.formField} data-span="full">
@@ -444,55 +513,6 @@ export default function MenuManagementTab({
                       disabled={readOnly}
                     />
                   </label>
-                </div>
-
-                <div className={styles.formField}>
-                  <label className={styles.label}>
-                    Meal Color
-                    <div className={styles.colorPickerWrapper}>
-                      <input
-                        type="color"
-                        className={styles.colorPicker}
-                        value={form.color || '#3b82f6'}
-                        onChange={(e) => setForm(prev => ({ ...prev, color: e.target.value }))}
-                        disabled={readOnly}
-                      />
-                      <input
-                        type="text"
-                        className={styles.colorInput}
-                        value={form.color || '#3b82f6'}
-                        onChange={(e) => setForm(prev => ({ ...prev, color: e.target.value }))}
-                        placeholder="#3b82f6"
-                        disabled={readOnly}
-                        pattern="^#[0-9A-Fa-f]{6}$"
-                      />
-                    </div>
-                  </label>
-                </div>
-
-                <div className={styles.formField} data-span="full">
-                  <label className={styles.label}>
-                    Image
-                    <div className={styles.uploadArea}>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleUpload}
-                        disabled={readOnly || uploading}
-                        className={styles.fileInput}
-                      />
-                      <div className={styles.uploadButton}>
-                        <Upload size={16} />
-                        {uploading ? 'Uploading...' : 'Choose image'}
-                      </div>
-                    </div>
-                  </label>
-
-                  {form.imageUrl && (
-                    <div className={styles.imagePreview}>
-                      <img src={form.imageUrl} alt="Meal preview" />
-                    </div>
-                  )}
                 </div>
 
                 {/* Stock Management Fields */}
