@@ -531,175 +531,62 @@ export default function MenuManagementTab({
                 </div>
               </div>
 
-              <div className={styles.optionSection}>
-                <div className={styles.optionSectionHeader}>
-                  <div>
-                    <h4 className={styles.optionSectionTitle}>Drink options</h4>
-                    <p className={styles.optionSectionSubtitle}>Add drinks that passengers can choose with this meal.</p>
-                  </div>
-                </div>
-
-                <div className={styles.optionList}>
-                  {form.drinkOptions.map((option, index) => (
-                    <div key={index} className={styles.optionItem}>
-                      <span>{option}</span>
-                      <button
-                        type="button"
-                        className={styles.optionRemoveButton}
-                        onClick={() => removeOption('drink', index)}
-                      >
-                        ×
-                      </button>
-                    </div>
+              {/* Options Tabs */}
+              <div className={styles.optionTabs}>
+                <div className={styles.tabButtons}>
+                  {optionTabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      className={`${styles.tabButton} ${activeOptionTab === tab.id ? styles.active : ''}`}
+                      onClick={() => setActiveOptionTab(tab.id)}
+                    >
+                      {tab.title}
+                    </button>
                   ))}
                 </div>
 
-                <div className={styles.optionInputRow}>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    value={newOption.drink}
-                    onChange={(e) => setNewOption(prev => ({ ...prev, drink: e.target.value }))}
-                    placeholder="Add a drink option"
-                    disabled={readOnly}
-                  />
-                  <button
-                    type="button"
-                    className={styles.optionAddButton}
-                    onClick={() => addOption('drink')}
-                    disabled={readOnly}
-                  >
-                    Add drink
-                  </button>
-                </div>
-              </div>
-
-              <div className={styles.optionSection}>
-                <div className={styles.optionSectionHeader}>
-                  <div>
-                    <h4 className={styles.optionSectionTitle}>Dessert options</h4>
-                    <p className={styles.optionSectionSubtitle}>Add desserts that passengers can choose with this meal.</p>
-                  </div>
-                </div>
-
-                <div className={styles.optionList}>
-                  {form.dessertOptions.map((option, index) => (
-                    <div key={index} className={styles.optionItem}>
-                      <span>{option}</span>
-                      <button
-                        type="button"
-                        className={styles.optionRemoveButton}
-                        onClick={() => removeOption('dessert', index)}
-                      >
-                        ×
-                      </button>
+                <div className={styles.tabContent}>
+                  <div className={styles.optionSectionHeader}>
+                    <div>
+                      <h4 className={styles.optionSectionTitle}>{activeOption.title}</h4>
+                      <p className={styles.optionSectionSubtitle}>{activeOption.subtitle}</p>
                     </div>
-                  ))}
-                </div>
-
-                <div className={styles.optionInputRow}>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    value={newOption.dessert}
-                    onChange={(e) => setNewOption(prev => ({ ...prev, dessert: e.target.value }))}
-                    placeholder="Add a dessert option"
-                    disabled={readOnly}
-                  />
-                  <button
-                    type="button"
-                    className={styles.optionAddButton}
-                    onClick={() => addOption('dessert')}
-                    disabled={readOnly}
-                  >
-                    Add dessert
-                  </button>
-                </div>
-              </div>
-
-              <div className={styles.optionSection}>
-                <div className={styles.optionSectionHeader}>
-                  <div>
-                    <h4 className={styles.optionSectionTitle}>Snack options</h4>
-                    <p className={styles.optionSectionSubtitle}>Add snacks that passengers can choose with this meal.</p>
                   </div>
-                </div>
 
-                <div className={styles.optionList}>
-                  {form.snackOptions.map((option, index) => (
-                    <div key={index} className={styles.optionItem}>
-                      <span>{option}</span>
-                      <button
-                        type="button"
-                        className={styles.optionRemoveButton}
-                        onClick={() => removeOption('snack', index)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                <div className={styles.optionInputRow}>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    value={newOption.snack}
-                    onChange={(e) => setNewOption(prev => ({ ...prev, snack: e.target.value }))}
-                    placeholder="Add a snack option"
-                    disabled={readOnly}
-                  />
-                  <button
-                    type="button"
-                    className={styles.optionAddButton}
-                    onClick={() => addOption('snack')}
-                    disabled={readOnly}
-                  >
-                    Add snack
-                  </button>
-                </div>
-              </div>
-
-              <div className={styles.optionSection}>
-                <div className={styles.optionSectionHeader}>
-                  <div>
-                    <h4 className={styles.optionSectionTitle}>Allergens</h4>
-                    <p className={styles.optionSectionSubtitle}>List allergens so passengers can avoid this meal if needed.</p>
+                  <div className={styles.optionList}>
+                    {activeOption.options.map((option, index) => (
+                      <div key={index} className={styles.optionItem}>
+                        <span>{option}</span>
+                        <button
+                          type="button"
+                          className={styles.optionRemoveButton}
+                          onClick={() => removeOption(activeOptionTab, index)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                </div>
 
-                <div className={styles.optionList}>
-                  {form.allergens.map((option, index) => (
-                    <div key={index} className={styles.optionItem}>
-                      <span>{option}</span>
-                      <button
-                        type="button"
-                        className={styles.optionRemoveButton}
-                        onClick={() => removeOption('allergen', index)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                <div className={styles.optionInputRow}>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    value={newOption.allergen}
-                    onChange={(e) => setNewOption(prev => ({ ...prev, allergen: e.target.value }))}
-                    placeholder="Add an allergen"
-                    disabled={readOnly}
-                  />
-                  <button
-                    type="button"
-                    className={styles.optionAddButton}
-                    onClick={() => addOption('allergen')}
-                    disabled={readOnly}
-                  >
-                    Add allergen
-                  </button>
+                  <div className={styles.optionInputRow}>
+                    <input
+                      type="text"
+                      className={styles.input}
+                      value={newOption[activeOptionTab]}
+                      onChange={(e) => setNewOption(prev => ({ ...prev, [activeOptionTab]: e.target.value }))}
+                      placeholder={activeOption.placeholder}
+                      disabled={readOnly}
+                    />
+                    <button
+                      type="button"
+                      className={styles.optionAddButton}
+                      onClick={() => addOption(activeOptionTab)}
+                      disabled={readOnly}
+                    >
+                      {activeOption.buttonLabel}
+                    </button>
+                  </div>
                 </div>
               </div>
 
