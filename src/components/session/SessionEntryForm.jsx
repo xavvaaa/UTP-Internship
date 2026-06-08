@@ -3,12 +3,12 @@
  */
 import { useId, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, AlertCircle, Plane, Key, ArrowRight, Coffee, Utensils, Clock, QrCode } from 'lucide-react'
+import { Loader2, AlertCircle, Plane, Key, ArrowRight, Coffee, QrCode } from 'lucide-react'
 import { useSession } from '../../context/useSession'
 import { joinPassengerSession, resolveSessionByCode } from '../../services/flightSessionService'
 import { isValidSeatFormat } from '../../utils/seatFormat'
-import FlightHeader from '../layout/FlightHeader'
 import QRScanner from '../qr/QRScanner'
+import { BRAND_NAME, pageTitle } from '../../constants/brand'
 import styles from './SessionEntryForm.module.css'
 
 export default function SessionEntryForm() {
@@ -24,7 +24,7 @@ export default function SessionEntryForm() {
   const [showQRScanner, setShowQRScanner] = useState(false)
 
   useEffect(() => {
-    document.title = 'IFMOD | Passenger Login'
+    document.title = pageTitle('Passenger Login')
   }, [])
 
   const handleQRScanSuccess = async (qrData) => {
@@ -125,57 +125,32 @@ export default function SessionEntryForm() {
             <div className={styles.logoSquare}>
               <Coffee size={24} />
             </div>
-            <div className={styles.logoText}>IFMOD</div>
+            <div className={styles.logoText}>{BRAND_NAME}</div>
           </div>
           
           <h1 className={styles.mainHeading}>In-Flight Meal Ordering System</h1>
           <div className={styles.accentLine}></div>
           <p className={styles.description}>
-            Welcome to your personalized in-flight dining experience. Browse our menu, customize your meals, and enjoy premium service during your journey.
+            Join with your seat number, choose a meal, and follow your order from your phone.
           </p>
-          
-          <div className={styles.featureCards}>
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>
-                <Utensils size={20} />
-              </div>
-              <div className={styles.featureContent}>
-                <h3>Browse Menu</h3>
-                <p>Explore our delicious meal options</p>
-              </div>
-            </div>
-            
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>
-                <Coffee size={20} />
-              </div>
-              <div className={styles.featureContent}>
-                <h3>Customize Orders</h3>
-                <p>Personalize your meal preferences</p>
-              </div>
-            </div>
-            
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>
-                <Clock size={20} />
-              </div>
-              <div className={styles.featureContent}>
-                <h3>Track Delivery</h3>
-                <p>Monitor your meal status in real-time</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
       
       <div className={styles.rightPanel}>
         <div className={styles.loginCard}>
+          <div className={styles.mobileBrand}>
+            <div className={styles.mobileBrandIcon}>
+              <Coffee size={20} />
+            </div>
+            <span className={styles.mobileBrandName}>{BRAND_NAME}</span>
+          </div>
+
           <div className={styles.qrBadge}>
             <QrCode size={32} />
           </div>
           
-          <h2 className={styles.loginTitle}>Access Your In-Flight Menu</h2>
-          <p className={styles.loginSubtitle}>Scan QR or enter details</p>
+          <h2 className={styles.loginTitle}>Access your in-flight menu</h2>
+          <p className={styles.loginSubtitle}>Scan the cabin QR code or enter the crew access code.</p>
           
           {sessionError ? (
             <p className={styles.alert} role="alert">
@@ -220,6 +195,7 @@ export default function SessionEntryForm() {
               <div className={styles.inputWrapper}>
                 <Key className={styles.inputIcon} size={20} />
                 <input
+                  id={accessId}
                   className={styles.input}
                   type="text"
                   autoComplete="off"
@@ -231,6 +207,7 @@ export default function SessionEntryForm() {
                   disabled={loading || sessionLoading}
                 />
               </div>
+              <span className={styles.fieldHint}>Ask cabin crew for the code if the QR is not available.</span>
             </label>
             
             <label className={styles.label}>
@@ -252,6 +229,7 @@ export default function SessionEntryForm() {
                   disabled={loading || sessionLoading}
                 />
               </div>
+              <span className={styles.fieldHint}>Use the format on your boarding pass, like 12A.</span>
             </label>
             
             <button className={styles.button} disabled={loading || sessionLoading}>

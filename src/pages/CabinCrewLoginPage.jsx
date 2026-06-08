@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { Loader2, ShieldCheck, AlertCircle, Eye, EyeOff, Mail, Lock, ArrowRight, ListTodo, Users, BarChart3 } from 'lucide-react'
 import { useAuth } from '../context/useAuth'
 import { getDefaultRoute } from '../utils/roleBasedRoutes'
+import { BRAND_NAME, pageTitle } from '../constants/brand'
 import styles from './AdminLoginPage.module.css'
 
 const REMEMBER_CREW_KEY = 'ifmod_remember_crew_login'
@@ -35,7 +36,7 @@ export default function CabinCrewLoginPage() {
   const isCabinCrewRoute = location.pathname === '/cabin-crew-login'
 
   useEffect(() => {
-    document.title = 'IFMOD | Cabin Crew Login'
+    document.title = pageTitle('Cabin Crew Login')
   }, [isCabinCrewRoute])
 
   useEffect(() => {
@@ -92,7 +93,7 @@ export default function CabinCrewLoginPage() {
             <div className={styles.logoSquare}>
               <ShieldCheck size={24} />
             </div>
-            <div className={styles.logoText}>IFMOD</div>
+            <div className={styles.logoText}>{BRAND_NAME}</div>
           </div>
           
           <h1 className={styles.mainHeading}>In-Flight Meal Ordering Dashboard</h1>

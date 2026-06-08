@@ -27,17 +27,18 @@
 
 .title {
   margin: 0 0 0.35rem;
-  font-size: clamp(1.4rem, 3vw, 2rem);
-  font-weight: 700;
+  font-size: var(--ps-text-display);
+  font-weight: var(--ps-weight-strong);
   letter-spacing: -0.02em;
-  line-height: 1.1;
+  line-height: var(--ps-leading-tight);
   color: var(--ifmod-text);
 }
 
 .subtitle {
   margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: var(--ps-text-body-lg);
+  font-weight: var(--ps-weight-regular);
+  line-height: var(--ps-leading-normal);
   color: var(--ifmod-muted);
 }
 
@@ -59,7 +60,7 @@
   right: 0;
   bottom: 0;
   padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom));
-  background: rgba(238, 244, 251, 0.96);
+  background: color-mix(in srgb, var(--ifmod-bg) 96%, transparent);
   border-top: 1px solid rgba(29, 67, 106, 0.08);
   display: flex;
   justify-content: center;

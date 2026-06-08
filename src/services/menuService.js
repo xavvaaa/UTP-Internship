@@ -25,7 +25,7 @@ function normalize(item = {}) {
     id: String(m.id ?? ''),
     name: String(m.name ?? 'Item'),
     description: String(m.description ?? ''),
-    imageUrl: String(m.imageUrl ?? m.image ?? ''),
+    imageUrl: String(m.imageUrl ?? m.image ?? m.imageURL ?? '').trim(),
     category: CATEGORIES.includes(category) ? category : 'meal',
     stock,
     flightId: String(m.flightId ?? ''),

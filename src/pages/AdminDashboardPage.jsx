@@ -9,6 +9,7 @@ import SidebarNavigation from '../components/layout/SidebarNavigation'
 import { useAuth } from '../context/useAuth'
 import { useSession } from '../context/useSession'
 import { useToast } from '../context/useToast'
+import { pageTitle } from '../constants/brand'
 import { auth, firebaseConfigured } from '../firebase/config'
 import { flightIdsEqual } from '../utils/flightId'
 import OrdersTab from '../components/admin/OrdersTab'
@@ -17,7 +18,7 @@ import MenuManagementTab from '../components/admin/MenuManagementTab'
 import ReportsTab from '../components/admin/ReportsTab'
 import SettingsTab from '../components/admin/SettingsTab'
 import SessionsTab from '../components/admin/SessionsTab'
-import { advanceOrderStatus, setOrderStatus, sortOrders, subscribeOrders } from '../services/admin/ordersAdminService'
+import { setOrderStatus, sortOrders, subscribeOrders } from '../services/admin/ordersAdminService'
 import {
   createMenuMeal,
   deleteMenuMeal,
@@ -51,7 +52,7 @@ export default function AdminDashboardPage() {
 
   // Validate URL parameters and redirect if accessing restricted tab
   useEffect(() => {
-    document.title = 'IFMOD | Dashboard'
+    document.title = pageTitle('Dashboard')
   }, [])
 
   useEffect(() => {
@@ -138,17 +139,6 @@ export default function AdminDashboardPage() {
       loadReport()
     }
   }, [activeTab, isAdminForActiveFlight])
-
-  async function handleAdvance(order) {
-    setUpdatingOrderId(order.id)
-    try {
-      await advanceOrderStatus(order.id, order.status)
-    } catch (err) {
-      showError(err?.message || 'Could not update order status.')
-    } finally {
-      setUpdatingOrderId('')
-    }
-  }
 
   async function handleSetOrderStatus(order, status) {
     setUpdatingOrderId(order.id)
@@ -296,7 +286,7 @@ export default function AdminDashboardPage() {
             sortMode={sortMode}
             onSortChange={setSortMode}
             updatingOrderId={updatingOrderId}
-            onAdvance={handleAdvance}
+            onStatusChange={handleSetOrderStatus}
           />
         )}
 

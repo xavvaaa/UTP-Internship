@@ -35,7 +35,7 @@ export default function GrabMenuRow({ item, onOpen, disabled }) {
         {item.allergens?.length ? (
           <p className={styles.allergens}>Contains: {item.allergens.join(', ')}</p>
         ) : null}
-        <p className={styles.meta}>{out ? 'Ask crew for alternatives' : 'Tap to customize drinks and sides'}</p>
+        <p className={styles.meta}>{out ? 'Ask crew for alternatives' : 'Customize and order'}</p>
       </div>
       <span className={styles.cta} aria-hidden>
         <ChevronRight size={22} strokeWidth={2} />

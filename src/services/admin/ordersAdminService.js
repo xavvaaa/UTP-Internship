@@ -78,6 +78,7 @@ export function subscribeOrders(onData, onError, flightInstanceId) {
           drink: String(data.drink ?? ''),
           dessert: String(data.dessert ?? ''),
           snack: String(data.snack ?? ''),
+          notes: String(data.notes ?? ''),
           status: String(data.status ?? 'pending').toLowerCase(),
           timestamp: data.timestamp ?? data.createdAt ?? null,
           updatedAt: data.updatedAt ?? null,

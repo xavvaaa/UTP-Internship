@@ -9,6 +9,7 @@ import PlaceOrderBar from '../components/menu/PlaceOrderBar'
 import OrderSummary from '../components/passenger/OrderSummary'
 import RadioPickSection from '../components/passenger/RadioPickSection'
 import StatusTracker from '../components/passenger/StatusTracker'
+import ConfirmDialog from '../components/common/ConfirmDialog'
 import { useSession } from '../context/useSession'
 import { firebaseConfigured } from '../firebase/config'
 import { usePassengerMenu } from '../hooks/usePassengerMenu'
@@ -69,8 +70,10 @@ export default function MenuCustomizePage() {
   const [drinkChoice, setDrinkChoice] = useState('')
   const [dessertChoice, setDessertChoice] = useState('')
   const [snackChoice, setSnackChoice] = useState('')
+  const [notes, setNotes] = useState('')
   const [orderLoading, setOrderLoading] = useState(false)
   const [orderError, setOrderError] = useState('')
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
 
   const meal = useMemo(
     () =>
@@ -120,6 +123,10 @@ export default function MenuCustomizePage() {
   }
 
   function handleLeave() {
+    setShowExitConfirm(true)
+  }
+
+  function confirmLeave() {
     clearSession()
     navigate('/')
   }
@@ -140,6 +147,7 @@ export default function MenuCustomizePage() {
         drinkName: readChoiceName(drinkChoice, drinkMeta),
         dessertName: readChoiceName(dessertChoice, dessertMeta),
         snackName: readChoiceName(snackChoice, snackMeta),
+        notes: notes.trim(),
       })
       navigate('/menu')
     } catch (e) {
@@ -153,16 +161,17 @@ export default function MenuCustomizePage() {
   const canSubmit = Boolean(
     meal && seatNumber && !orderLocked && !menuError && !menuLoading && isItemSelectable(meal),
   )
+  const selectedExtras = [drinkChoice, dessertChoice, snackChoice].filter(Boolean).length
+
+  function clearOptionalChoices() {
+    setDrinkChoice('')
+    setDessertChoice('')
+    setSnackChoice('')
+  }
 
   return (
     <PageShell
-      title=""
-      subtitle=""
-      actions={
-        <button type="button" className="ifmod-icon-btn" onClick={handleLeave} aria-label="End session">
-          <LogOut size={18} strokeWidth={2} />
-        </button>
-      }
+      hideHeader
       footer={
         <PlaceOrderBar
           disabled={!canSubmit}
@@ -181,8 +190,15 @@ export default function MenuCustomizePage() {
         >
           <ArrowLeft size={22} strokeWidth={2} />
         </button>
-        <span className={styles.topTitle}>Customize</span>
-        <span className={styles.topSpacer} aria-hidden />
+        <span className={styles.topTitle}>Customize order</span>
+        <button
+          type="button"
+          className={styles.topAction}
+          onClick={handleLeave}
+          aria-label="End session"
+        >
+          <LogOut size={20} strokeWidth={2} />
+        </button>
       </div>
 
       {menuError && firebaseConfigured ? (
@@ -213,7 +229,7 @@ export default function MenuCustomizePage() {
         </p>
       ) : null}
 
-      {liveOrder ? <StatusTracker order={liveOrder} /> : null}
+      {liveOrder ? <StatusTracker order={liveOrder} menuItems={menuItems} /> : null}
 
       {!orderLocked && meal && !menuLoading ? (
         <>
@@ -240,6 +256,41 @@ export default function MenuCustomizePage() {
             dessert={dessertChoice ? readChoiceName(dessertChoice, dessertMeta) : null}
             snack={snackChoice ? readChoiceName(snackChoice, snackMeta) : null}
           />
+
+          <section className={styles.notesPanel} aria-labelledby="passenger-notes-title">
+            <label className={styles.notesLabel} htmlFor="passenger-notes">
+              <span id="passenger-notes-title">Preferences or allergy notes</span>
+              <textarea
+                id="passenger-notes"
+                className={styles.notesInput}
+                value={notes}
+                onChange={(event) => setNotes(event.target.value.slice(0, 300))}
+                maxLength={300}
+                rows={4}
+                placeholder="Example: No peanuts, lactose intolerant, no ice, vegetarian preference..."
+              />
+            </label>
+            <div className={styles.notesMeta}>
+              <span>Please tell cabin crew directly about severe allergies.</span>
+              <span>{notes.length}/300</span>
+            </div>
+          </section>
+
+          <div className={styles.choiceIntro}>
+            <div>
+              <span className={styles.choiceKicker}>Optional choices</span>
+              <p>
+                {selectedExtras
+                  ? `${selectedExtras} extra ${selectedExtras === 1 ? 'choice' : 'choices'} selected`
+                  : 'No extras selected yet'}
+              </p>
+            </div>
+            {selectedExtras ? (
+              <button type="button" className={styles.clearChoices} onClick={clearOptionalChoices}>
+                Reset extras
+              </button>
+            ) : null}
+          </div>
 
           <div className={styles.groups}>
             {CATEGORY_ORDER.map((cat) => {
@@ -268,6 +319,16 @@ export default function MenuCustomizePage() {
           </div>
         </>
       ) : null}
+      <ConfirmDialog
+        isOpen={showExitConfirm}
+        title="Exit passenger session?"
+        message="Are you sure you want to exit? This will remove your saved flight and seat from this device, so you will need the access code again to rejoin."
+        confirmText="Exit session"
+        cancelText="Stay here"
+        type="warning"
+        onConfirm={confirmLeave}
+        onCancel={() => setShowExitConfirm(false)}
+      />
     </PageShell>
   )
 }

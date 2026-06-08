@@ -1,3 +1,5 @@
+import { BRAND_NAME } from '../constants/brand'
+
 const MIME = {
   pdf: 'application/pdf',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -29,7 +31,7 @@ function downloadBlob(filename, type, bytes) {
 
 function buildPdf(report) {
   const rows = [
-    'IFMOD Operations Report',
+    `${BRAND_NAME} Operations Report`,
     `Generated: ${report.generatedAt}`,
     '',
     `Total orders: ${report.metrics.totalOrders}`,
@@ -82,7 +84,7 @@ function buildPdf(report) {
 
 function buildDocx(report) {
   const body = [
-    paragraph('IFMOD Operations Report', 'Title'),
+    paragraph(`${BRAND_NAME} Operations Report`, 'Title'),
     paragraph(`Generated: ${report.generatedAt}`),
     paragraph('Executive Summary', 'Heading1'),
     table([

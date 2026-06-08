@@ -143,6 +143,7 @@ export function SessionProvider({ children }) {
   const route = sessionData?.route
   const departureTime = sessionData?.departureTime || sessionData?.departure_time
   const arrivalTime = sessionData?.arrivalTime || sessionData?.arrival_time
+  const accessCode = sessionData?.accessCode || sessionData?.access_code
 
   const value = useMemo(
     () => ({
@@ -158,6 +159,7 @@ export function SessionProvider({ children }) {
       route,
       departureTime,
       arrivalTime,
+      accessCode,
 
       loading,
       error,
@@ -181,6 +183,7 @@ export function SessionProvider({ children }) {
       route,
       departureTime,
       arrivalTime,
+      accessCode,
       loading,
       error,
       setSessionId,

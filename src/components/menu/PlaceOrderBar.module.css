@@ -10,9 +10,9 @@
   gap: 0.5rem;
   padding: 0.95rem 1rem;
   border: none;
-  border-radius: 0.85rem;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: var(--ps-radius-md);
+  font-size: var(--ps-text-title-sm);
+  font-weight: var(--ps-weight-medium);
   cursor: pointer;
   background: var(--ifmod-accent);
   color: #fff;
@@ -46,7 +46,8 @@
 .locked {
   margin: 0;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
   color: var(--ifmod-muted);
   padding: 0.65rem 0.5rem;
   background: var(--ifmod-surface);

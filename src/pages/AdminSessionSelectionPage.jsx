@@ -10,6 +10,7 @@ import { getAuthToken } from '../utils/authToken'
 import { getSessionSummary, createSession, lookupFlightRoute } from '../services/flightSessionService'
 import { DEFAULT_SEAT_LAYOUT_ID, SEAT_LAYOUTS, getSeatLayoutOption } from '../data/seatLayouts'
 import SessionConfirmModal from '../components/common/SessionConfirmModal'
+import { BRAND_NAME, pageTitle } from '../constants/brand'
 import styles from './AdminSessionSelectionPage.module.css'
 
 export default function AdminSessionSelectionPage() {
@@ -149,7 +150,7 @@ export default function AdminSessionSelectionPage() {
   const getTodayDate = () => new Date().toISOString().split('T')[0]
 
   useEffect(() => {
-    document.title = 'IFMOD | Select Session'
+    document.title = pageTitle('Select Session')
   }, [])
 
   if (showCreateForm) {
@@ -161,7 +162,7 @@ export default function AdminSessionSelectionPage() {
               <div className={styles.logoSquare}>
                 <Plane size={24} />
               </div>
-              <div className={styles.logoText}>IFMOD</div>
+              <div className={styles.logoText}>{BRAND_NAME}</div>
             </div>
             
             <h1 className={styles.mainHeading}>Create New Session</h1>
@@ -360,7 +361,7 @@ export default function AdminSessionSelectionPage() {
             <div className={styles.logoSquare}>
               <Plane size={24} />
             </div>
-            <div className={styles.logoText}>IFMOD</div>
+            <div className={styles.logoText}>{BRAND_NAME}</div>
           </div>
           
           <h1 className={styles.mainHeading}>Select Session</h1>

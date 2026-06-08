@@ -9,8 +9,17 @@ export default function ReportsTab({ orders, menuItems = [], summary, onRefresh 
   function exportCsv() {
     downloadCsv(
       `${report.fileBaseName}.csv`,
-      ['Order ID', 'Seat', 'Meal', 'Drink', 'Dessert', 'Snack', 'Status'],
-      orders.map((o) => [o.orderId, o.seatNumber, o.meal, o.drink, o.dessert, o.snack ?? '', o.status]),
+      ['Order ID', 'Seat', 'Meal', 'Drink', 'Dessert', 'Snack', 'Notes', 'Status'],
+      orders.map((o) => [
+        o.orderId,
+        o.seatNumber,
+        o.meal,
+        o.drink,
+        o.dessert,
+        o.snack ?? '',
+        o.notes ?? '',
+        o.status,
+      ]),
     )
   }
 
@@ -199,7 +208,7 @@ function buildReport({ orders, menuItems, summary }) {
   })
   const completionRate = totalOrders ? Math.round((delivered / totalOrders) * 100) : 0
   const generatedAt = new Date().toLocaleString()
-  const fileBaseName = `ifmod-report-${new Date().toISOString().slice(0, 10)}`
+  const fileBaseName = `skyserve-report-${new Date().toISOString().slice(0, 10)}`
 
   return {
     fileBaseName,

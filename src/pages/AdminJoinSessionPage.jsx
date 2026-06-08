@@ -9,6 +9,7 @@ import { useAuth } from '../context/useAuth'
 import { useSession } from '../context/useSession'
 import { resolveSessionByCode } from '../services/flightSessionService'
 import { getDefaultRoute } from '../utils/roleBasedRoutes'
+import { BRAND_NAME, pageTitle } from '../constants/brand'
 import styles from './AdminLoginPage.module.css'
 
 export default function AdminJoinSessionPage() {
@@ -19,7 +20,7 @@ export default function AdminJoinSessionPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   useEffect(() => {
-    document.title = 'IFMOD | Cabin Crew Login'
+    document.title = pageTitle('Cabin Crew Login')
   }, [])
 
   async function handleSubmit(e) {
@@ -71,7 +72,7 @@ export default function AdminJoinSessionPage() {
             <div className={styles.logoSquare}>
               <Plane size={24} />
             </div>
-            <div className={styles.logoText}>IFMOD</div>
+            <div className={styles.logoText}>{BRAND_NAME}</div>
           </div>
           
           <h1 className={styles.mainHeading}>In-Flight Meal Ordering Dashboard</h1>

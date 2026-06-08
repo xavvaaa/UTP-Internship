@@ -3,11 +3,12 @@
  */
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AlertCircle, Clock, Loader2, LogOut, Plane, Search, UtensilsCrossed } from 'lucide-react'
+import { AlertCircle, Loader2, LogOut, Search, UtensilsCrossed } from 'lucide-react'
 import PageShell from '../components/layout/PageShell'
 import FlightHeader from '../components/layout/FlightHeader'
 import GrabMenuRow from '../components/passenger/GrabMenuRow'
 import StatusTracker from '../components/passenger/StatusTracker'
+import ConfirmDialog from '../components/common/ConfirmDialog'
 import { useSession } from '../context/useSession'
 import { firebaseConfigured } from '../firebase/config'
 import { usePassengerMenu } from '../hooks/usePassengerMenu'
@@ -21,16 +22,13 @@ export default function MenuPage() {
     seatNumber,
     clearSession,
     flightNumber,
-    route,
-    departureTime,
-    arrivalTime,
-    isActive,
     loading: sessionLoading,
     error: sessionError,
   } = useSession()
   const { menuItems, menuLoading, menuError } = usePassengerMenu(sessionId)
   const { liveOrder, orderSubError } = useOrderForSession(sessionId, seatNumber)
   const [searchQuery, setSearchQuery] = useState('')
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
 
   const meals = useMemo(() => {
     const list = menuItems.filter((m) => String(m.category || 'meal').toLowerCase() === 'meal')
@@ -50,6 +48,10 @@ export default function MenuPage() {
   }, [meals, searchQuery])
 
   function handleLeave() {
+    setShowExitConfirm(true)
+  }
+
+  function confirmLeave() {
     clearSession()
     navigate('/')
   }
@@ -110,57 +112,6 @@ export default function MenuPage() {
             </button>
           }
         >
-          <section className={styles.dashboardHero}>
-            <div className={styles.heroCopy}>
-              <span className={styles.eyebrow}>Passenger dashboard</span>
-              <h2>Welcome aboard</h2>
-              <p>Pick a meal, customize your sides, and track your order as cabin crew prepares it.</p>
-            </div>
-
-            <div className={styles.heroCards}>
-              <article className={styles.heroCard}>
-                <span className={styles.heroLabel}>Seat</span>
-                <strong>{seatNumber || 'N/A'}</strong>
-              </article>
-              <article className={styles.heroCard}>
-                <span className={styles.heroLabel}>Meals</span>
-                <strong>{meals.length}</strong>
-              </article>
-              <article className={`${styles.heroCard} ${isActive ? styles.goodCard : styles.warnCard}`}>
-                <span className={styles.heroLabel}>Session</span>
-                <strong>{isActive ? 'Active' : 'Inactive'}</strong>
-              </article>
-            </div>
-          </section>
-
-          {flightNumber ? (
-            <section className={styles.flightInfo}>
-              <div className={styles.flightSummary}>
-                <Plane size={18} className={styles.flightIcon} />
-                <div>
-                  <h3 className={styles.flightTitle}>{flightNumber}</h3>
-                  {route ? <p className={styles.flightRoute}>{route}</p> : null}
-                </div>
-              </div>
-              <div className={styles.flightDetails}>
-                {departureTime ? (
-                  <div className={styles.flightDetail}>
-                    <Clock size={14} aria-hidden />
-                    <span className={styles.flightLabel}>Departure</span>
-                    <span className={styles.flightValue}>{formatTime(departureTime)}</span>
-                  </div>
-                ) : null}
-                {arrivalTime ? (
-                  <div className={styles.flightDetail}>
-                    <Clock size={14} aria-hidden />
-                    <span className={styles.flightLabel}>Arrival</span>
-                    <span className={styles.flightValue}>{formatTime(arrivalTime)}</span>
-                  </div>
-                ) : null}
-              </div>
-            </section>
-          ) : null}
-
           {!orderLocked ? (
             <section className={styles.menuPanel}>
               <div className={styles.menuPanelHeader}>
@@ -183,7 +134,7 @@ export default function MenuPage() {
                     type="search"
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder="Search meals"
+                    placeholder="Search meal, ingredient, allergen"
                   />
                 </label>
               </div>
@@ -211,7 +162,7 @@ export default function MenuPage() {
             </p>
           ) : null}
 
-          {liveOrder ? <StatusTracker order={liveOrder} /> : null}
+          {liveOrder ? <StatusTracker order={liveOrder} menuItems={menuItems} /> : null}
 
           {!orderLocked && !menuLoading && firebaseConfigured ? (
             <ul className={styles.grabList}>
@@ -249,33 +200,18 @@ export default function MenuPage() {
               </p>
             </div>
           ) : null}
+          <ConfirmDialog
+            isOpen={showExitConfirm}
+            title="Exit passenger session?"
+            message="Are you sure you want to exit? This will remove your saved flight and seat from this device, so you will need the access code again to rejoin."
+            confirmText="Exit session"
+            cancelText="Stay here"
+            type="warning"
+            onConfirm={confirmLeave}
+            onCancel={() => setShowExitConfirm(false)}
+          />
         </PageShell>
       </div>
     </div>
   )
-}
-
-function formatTime(timeString) {
-  if (!timeString) return ''
-
-  try {
-    if (typeof timeString === 'string') {
-      if (/^\d{1,2}:\d{2}$/.test(timeString)) {
-        return timeString
-      }
-
-      const date = new Date(timeString)
-      if (!Number.isNaN(date.getTime())) {
-        return date.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: false,
-        })
-      }
-    }
-
-    return timeString
-  } catch {
-    return timeString
-  }
 }

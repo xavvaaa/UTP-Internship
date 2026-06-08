@@ -26,6 +26,11 @@ export default function PlaceOrderBar({ disabled, loading, onPlaceOrder, lockedM
             <Loader2 className={styles.spin} size={20} aria-hidden />
             Placing order
           </>
+        ) : disabled ? (
+          <>
+            <ShoppingBag size={20} aria-hidden />
+            Choose an available meal
+          </>
         ) : (
           <>
             <ShoppingBag size={20} aria-hidden />

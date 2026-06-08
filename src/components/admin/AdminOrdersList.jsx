@@ -26,23 +26,25 @@ export default function AdminOrdersList({ orders, updatingOrderId, onAdvance }) 
                 <span className={styles.label}>Status</span>
                 <span className={`${styles.status} ${styles[order.status] || ''}`}>{order.status}</span>
               </div>
-              <button
-                className={styles.button}
-                type="button"
-                onClick={() => onAdvance(order)}
-                disabled={!next || updatingOrderId === order.id}
-              >
-                {updatingOrderId === order.id ? (
-                  <>
-                    <Loader2 size={14} className={styles.spin} aria-hidden />
-                    Updating
-                  </>
-                ) : next ? (
-                  `${order.status} -> ${next}`
-                ) : (
-                  'Delivered'
-                )}
-              </button>
+              {next ? (
+                <button
+                  className={styles.button}
+                  type="button"
+                  onClick={() => onAdvance(order)}
+                  disabled={updatingOrderId === order.id}
+                >
+                  {updatingOrderId === order.id ? (
+                    <>
+                      <Loader2 size={14} className={styles.spin} aria-hidden />
+                      Updating
+                    </>
+                  ) : (
+                    `${order.status} -> ${next}`
+                  )}
+                </button>
+              ) : (
+                <span className={`${styles.status} ${styles.delivered}`}>Delivered</span>
+              )}
             </li>
           )
         })}

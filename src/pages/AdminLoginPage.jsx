@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Loader2, AlertCircle, Eye, EyeOff, Mail, Lock, ArrowRight, ListTodo, Users, BarChart3 } from 'lucide-react'
 import { useAuth } from '../context/useAuth'
+import { BRAND_NAME, pageTitle } from '../constants/brand'
 import styles from './AdminLoginPage.module.css'
 
 const REMEMBER_ADMIN_KEY = 'ifmod_remember_admin_login'
@@ -34,7 +35,7 @@ export default function AdminLoginPage() {
   const from = location.state?.from || '/admin/select-session'
 
   useEffect(() => {
-    document.title = 'IFMOD | Admin Login'
+    document.title = pageTitle('Admin Login')
   }, [])
 
   useEffect(() => {
@@ -90,7 +91,7 @@ export default function AdminLoginPage() {
             <div className={styles.logoSquare}>
               <Lock size={24} />
             </div>
-            <div className={styles.logoText}>IFMOD</div>
+            <div className={styles.logoText}>{BRAND_NAME}</div>
           </div>
           
           <h1 className={styles.mainHeading}>In-Flight Meal Ordering Dashboard</h1>

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../context/useAuth'
 import { useSession } from '../../context/useSession'
+import { BRAND_NAME } from '../../constants/brand'
 import styles from './SidebarNavigation.module.css'
 
 const NAVIGATION_ITEMS = [
@@ -115,7 +116,7 @@ export default function SidebarNavigation({ activeTab, onTabChange, flightId, ca
             <Plane size={28} className={styles.logoIcon} />
             {!isCollapsed && (
               <div className={styles.logoText}>
-                <h2 className={styles.logoTitle}>IFMOD</h2>
+                <h2 className={styles.logoTitle}>{BRAND_NAME}</h2>
                 <p className={styles.logoSubtitle}>Cabin Crew</p>
               </div>
             )}

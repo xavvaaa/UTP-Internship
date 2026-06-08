@@ -1,10 +1,9 @@
 /* Flight Header Component Styles */
 .header {
-  background: linear-gradient(135deg, var(--ifmod-primary) 0%, var(--ifmod-accent) 100%);
-  color: white;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--ifmod-surface);
+  color: var(--ifmod-text);
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--ifmod-border);
 }
 
 .headerContent {
@@ -19,7 +18,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   gap: 1rem;
 }
 
@@ -27,50 +25,75 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .flightSection .icon {
-  opacity: 0.9;
+  color: var(--ifmod-accent);
 }
 
 .flightNumber {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: var(--ps-text-title-lg);
+  font-weight: var(--ps-weight-strong);
   margin: 0;
-  color: white;
+  color: var(--ifmod-text);
+  letter-spacing: -0.01em;
+  line-height: var(--ps-leading-tight);
 }
 
 .route {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.9rem;
-  opacity: 0.9;
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
+  color: var(--ifmod-muted);
   margin-top: 0.25rem;
 }
 
-.statusBadge {
+.headerActions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.875rem;
-  font-weight: 600;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  flex-wrap: nowrap;
+  margin-left: auto;
+}
+
+.accessCode,
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.25rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 999px;
+  background: #f8fafc;
+  color: var(--ifmod-text);
+}
+
+.accessLabel {
+  color: var(--ifmod-muted);
+  font-size: var(--ps-text-label);
+  font-weight: var(--ps-weight-medium);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
 }
 
-.statusBadge.active {
-  background: rgba(34, 197, 94, 0.2);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-  color: #dcfce7;
+.accessCode strong,
+.statusPill strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
 }
 
-.statusBadge.inactive {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fecaca;
+.statusPill.active {
+  color: var(--ifmod-success);
+}
+
+.statusPill.inactive {
+  color: var(--ifmod-danger);
 }
 
 .secondaryInfo {
@@ -78,8 +101,9 @@
   align-items: center;
   gap: 1.5rem;
   flex-wrap: wrap;
-  font-size: 0.875rem;
-  opacity: 0.9;
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
+  color: var(--ifmod-muted);
 }
 
 .timeInfo {
@@ -88,20 +112,10 @@
   gap: 0.25rem;
 }
 
-.sessionInfo {
-  margin-left: auto;
-}
-
-.sessionId {
-  font-family: monospace;
-  font-size: 0.8rem;
-  opacity: 0.7;
-}
-
 /* Compact variant */
 .compact {
   padding: 0.75rem 1rem;
-  background: var(--ifmod-primary);
+  background: var(--ifmod-surface);
 }
 
 .compactContent {
@@ -110,38 +124,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
 .flightInfo {
   display: flex;
   align-items: center;
   gap: 1rem;
+  min-width: 0;
+}
+
+.compactMeta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  flex-wrap: nowrap;
+  margin-left: auto;
 }
 
 .compact .flightNumber {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: var(--ps-text-title);
+  font-weight: var(--ps-weight-medium);
 }
 
 .compact .route {
-  font-size: 0.875rem;
+  font-size: var(--ps-text-body);
   margin-top: 0;
-}
-
-.compact .status {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.compact .status.active {
-  color: #dcfce7;
-}
-
-.compact .status.inactive {
-  color: #fecaca;
 }
 
 /* Loading state */
@@ -170,7 +179,8 @@
 
 /* Error state */
 .error {
-  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  background: #fef2f2;
+  color: var(--ifmod-danger);
 }
 
 .errorContent {
@@ -189,28 +199,56 @@
   }
   
   .primaryInfo {
-    flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.5rem;
+  }
+
+  .headerActions {
+    max-width: none;
+    margin-left: auto;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .accessCode,
+  .statusPill {
+    min-height: 2.1rem;
+    padding: 0.4rem 0.65rem;
   }
   
   .secondaryInfo {
-    gap: 1rem;
-    font-size: 0.8rem;
-  }
-  
-  .sessionInfo {
-    margin-left: 0;
-    width: 100%;
+    display: none;
   }
   
   .flightNumber {
-    font-size: 1.25rem;
+    font-size: 1.05rem;
   }
   
   .compactContent {
     flex-direction: column;
     gap: 0.5rem;
     align-items: flex-start;
+    width: 100%;
+  }
+
+  .compactMeta {
+    width: auto;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .primaryInfo {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .headerActions,
+  .compactMeta {
+    width: 100%;
+    justify-content: space-between;
   }
 }

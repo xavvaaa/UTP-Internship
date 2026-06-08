@@ -5,8 +5,9 @@
 
 .title {
   margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: var(--ps-text-title-sm);
+  font-weight: var(--ps-weight-medium);
+  color: var(--ifmod-text);
 }
 
 .list {
@@ -24,6 +25,7 @@
 
 .empty {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
   color: var(--ifmod-muted);
 }

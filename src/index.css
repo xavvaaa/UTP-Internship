@@ -13,6 +13,24 @@
   --ifmod-danger: #b63933;
   --ifmod-shadow: 0 20px 45px rgba(21, 38, 57, 0.09);
 
+  /* Passenger UI typography (shared across menu, login, order flow) */
+  --ps-text-label: 0.6875rem;
+  --ps-text-caption: 0.8125rem;
+  --ps-text-body: 0.875rem;
+  --ps-text-body-lg: 0.9375rem;
+  --ps-text-title-sm: 1rem;
+  --ps-text-title: 1.125rem;
+  --ps-text-title-lg: 1.25rem;
+  --ps-text-display: clamp(1.35rem, 4vw, 1.75rem);
+  --ps-weight-regular: 500;
+  --ps-weight-medium: 600;
+  --ps-weight-strong: 700;
+  --ps-leading-tight: 1.25;
+  --ps-leading-normal: 1.5;
+  --ps-radius-sm: 0.65rem;
+  --ps-radius-md: 0.85rem;
+  --ps-radius-lg: 1rem;
+
   color: var(--ifmod-text);
   background-color: var(--ifmod-bg);
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -38,7 +56,7 @@ html {
 body {
   margin: 0;
   min-height: 100svh;
-  background: radial-gradient(circle at top, rgba(24, 103, 154, 0.08), transparent 35%), var(--ifmod-bg);
+  background: var(--ifmod-bg);
   color: var(--ifmod-text);
 }
 

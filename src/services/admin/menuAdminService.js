@@ -40,7 +40,7 @@ export function subscribeMenu(onData, onError, flightInstanceId) {
       id: String(data.id ?? ''),
       name: String(data.name ?? 'Meal'),
       description: String(data.description ?? ''),
-      imageUrl: String(data.imageUrl ?? ''),
+      imageUrl: String(data.imageUrl ?? data.image ?? data.imageURL ?? '').trim(),
       color: String(data.color ?? '#3b82f6'),
       stock,
       category: MENU_CATEGORIES.includes(String(data.category ?? '').toLowerCase())

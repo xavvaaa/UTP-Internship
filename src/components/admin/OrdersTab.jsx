@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Loader2, Search } from 'lucide-react'
-import { getNextOrderStatus } from '../../services/admin/ordersAdminService'
+import { ORDER_STATUSES } from '../../services/admin/ordersAdminService'
 import styles from './OrdersTab.module.css'
 
 function fmtTime(ts) {
@@ -9,7 +9,20 @@ function fmtTime(ts) {
   return Number.isNaN(d.getTime()) ? 'N/A' : d.toLocaleString()
 }
 
-export default function OrdersTab({ orders, menuItems, sortMode, onSortChange, updatingOrderId, onAdvance }) {
+function getOrderHeadline(order) {
+  const meal = String(order?.meal ?? '').trim()
+  if (meal) return meal
+  const seat = String(order?.seatNumber ?? '').trim()
+  if (seat) return `Seat ${seat}`
+  return 'Order'
+}
+
+function getOrderSubline(order) {
+  const time = fmtTime(order?.timestamp)
+  return time !== 'N/A' ? `Ordered ${time}` : ''
+}
+
+export default function OrdersTab({ orders, menuItems, sortMode, onSortChange, updatingOrderId, onStatusChange }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
 
@@ -41,6 +54,7 @@ export default function OrdersTab({ orders, menuItems, sortMode, onSortChange, u
         order.drink,
         order.dessert,
         order.snack,
+        order.notes,
         order.status,
       ]
         .filter(Boolean)
@@ -140,15 +154,18 @@ export default function OrdersTab({ orders, menuItems, sortMode, onSortChange, u
           </div>
         ) : (
           visibleOrders.map((order) => {
-            const next = getNextOrderStatus(order.status)
+            const isUpdating = updatingOrderId === order.id
+            const isLocked = order.status === 'delivered'
             return (
               <div key={order.id} className={styles.orderCard}>
                 <div className={styles.orderHeader}>
                   <div className={styles.orderIdentity}>
                     <span className={styles.seatNumber}>{order.seatNumber || 'N/A'}</span>
                     <div>
-                      <div className={styles.orderId}>Order #{order.orderId}</div>
-                      <div className={styles.orderTime}>{fmtTime(order.timestamp)}</div>
+                      <div className={styles.orderId}>{getOrderHeadline(order)}</div>
+                      {getOrderSubline(order) ? (
+                        <div className={styles.orderTime}>{getOrderSubline(order)}</div>
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -171,29 +188,44 @@ export default function OrdersTab({ orders, menuItems, sortMode, onSortChange, u
                       <span className={styles.noOptions}>No additional options</span>
                     )}
                   </div>
+                  {order.notes ? (
+                    <div className={styles.notesBox}>
+                      <span className={styles.detailLabel}>Passenger notes</span>
+                      <p>{order.notes}</p>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className={styles.orderActions}>
-                  <span className={styles.nextStep}>
-                    {next ? `Next: ${next}` : 'Order complete'}
-                  </span>
-                  <button
-                    type="button"
-                    className={styles.advanceButton}
-                    onClick={() => onAdvance(order)}
-                    disabled={!next || updatingOrderId === order.id}
-                  >
-                    {updatingOrderId === order.id ? (
+                  <span className={styles.statusControlLabel}>
+                    {isUpdating ? (
                       <>
-                        <Loader2 size={16} className={styles.spin} />
+                        <Loader2 size={14} className={styles.spin} />
                         Updating...
                       </>
-                    ) : next ? (
-                      `Mark as ${next}`
+                    ) : isLocked ? (
+                      'Order delivered'
                     ) : (
-                      'Delivered'
+                      'Update status'
                     )}
-                  </button>
+                  </span>
+                  <div className={`${styles.statusButtons} ${isLocked ? styles.statusButtonsDelivered : ''}`}>
+                    {(isLocked ? ['delivered'] : ORDER_STATUSES).map((status) => {
+                      const isCurrent = order.status === status
+                      return (
+                        <button
+                          key={status}
+                          type="button"
+                          className={`${styles.statusButton} ${isCurrent ? styles[`statusButton_${status}`] : ''} ${isCurrent ? styles.statusButtonActive : ''}`}
+                          onClick={() => onStatusChange?.(order, status)}
+                          disabled={isUpdating || isCurrent}
+                          aria-current={isCurrent ? 'step' : undefined}
+                        >
+                          {status}
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
             )

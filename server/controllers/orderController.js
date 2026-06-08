@@ -36,6 +36,7 @@ export async function createOrder(req, res) {
     dessertName,
     snackId,
     snackName,
+    notes,
     flightId: _ignoreFlightId,
   } = req.body ?? {}
 
@@ -46,6 +47,7 @@ export async function createOrder(req, res) {
   const drinkMenuId = String(drinkId ?? '').trim()
   const dessertMenuId = String(dessertId ?? '').trim()
   const snackMenuId = String(snackId ?? '').trim()
+  const passengerNotes = String(notes ?? '').trim().slice(0, 300)
 
   if (!session || !seat || !menuId) {
     return badRequest(res, 'sessionId, seatNumber, and mealId are required.')
@@ -213,6 +215,7 @@ export async function createOrder(req, res) {
         drink: drinkText,
         dessert: dessertText,
         snack: snackText,
+        notes: passengerNotes,
         status: 'pending',
         timestamp: FieldValue.serverTimestamp(),
         createdAt: FieldValue.serverTimestamp(),

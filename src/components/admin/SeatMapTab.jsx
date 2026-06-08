@@ -90,7 +90,7 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
         {showDetails && order ? (
           <span className={styles.meta}>
             <span className={styles.mealColor} style={{ backgroundColor: getMealColor(order.meal) }}></span>
-            {order.orderId} {short(order.meal)}
+            {short(order.meal)}
           </span>
         ) : null}
       </button>
@@ -114,6 +114,7 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
       order?.drink,
       order?.dessert,
       order?.snack,
+      order?.notes,
       status,
       cabin,
     ]
@@ -357,14 +358,6 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
             ) : (
               <div className={styles.modalBody}>
                 <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Order ID:</span>
-                  <span className={styles.detailValue}>#{selectedSeatInfo.orderId}</span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Flight ID:</span>
-                  <span className={styles.detailValue}>{selectedSeatInfo.flightId || selectedSeatInfo.sessionId || 'N/A'}</span>
-                </div>
-                <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Meal:</span>
                   <span className={styles.detailValueWithColor}>
                     {selectedSeatInfo.meal ? (
@@ -391,6 +384,12 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
                     <span className={styles.detailValue}>{selectedSeatInfo.snack}</span>
                   </div>
                 )}
+                {selectedSeatInfo.notes && (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Notes:</span>
+                    <span className={styles.detailValue}>{selectedSeatInfo.notes}</span>
+                  </div>
+                )}
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Updated:</span>
                   <span className={styles.detailValue}>{formatTime(selectedSeatInfo.updatedAt || selectedSeatInfo.timestamp)}</span>
@@ -406,22 +405,30 @@ export default function SeatMapTab({ orders, menuItems, session, updatingOrderId
                         <Loader2 size={14} className={styles.spin} />
                         Updating status...
                       </>
+                    ) : selectedOrder.status === 'delivered' ? (
+                      'Order delivered'
                     ) : (
                       'Update status'
                     )}
                   </span>
-                  <div className={styles.statusButtons}>
-                    {ORDER_STATUSES.map((status) => (
-                      <button
-                        key={status}
-                        type="button"
-                        className={`${styles.statusButton} ${styles[status]} ${selectedOrder.status === status ? styles.statusButtonActive : ''}`}
-                        onClick={() => onStatusChange?.(selectedOrder, status)}
-                        disabled={selectedOrderUpdating || selectedOrder.status === status}
-                      >
-                        {status}
-                      </button>
-                    ))}
+                  <div
+                    className={`${styles.statusButtons} ${selectedOrder.status === 'delivered' ? styles.statusButtonsDelivered : ''}`}
+                  >
+                    {(selectedOrder.status === 'delivered' ? ['delivered'] : ORDER_STATUSES).map((status) => {
+                      const isCurrent = selectedOrder.status === status
+                      return (
+                        <button
+                          key={status}
+                          type="button"
+                          className={`${styles.statusButton} ${isCurrent ? styles[`statusButton_${status}`] : ''} ${isCurrent ? styles.statusButtonActive : ''}`}
+                          onClick={() => onStatusChange?.(selectedOrder, status)}
+                          disabled={selectedOrderUpdating || isCurrent}
+                          aria-current={isCurrent ? 'step' : undefined}
+                        >
+                          {status}
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
               ) : null}

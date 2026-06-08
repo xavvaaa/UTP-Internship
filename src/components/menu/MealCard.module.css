@@ -52,7 +52,7 @@
 .imagePlaceholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--ifmod-border), transparent);
+  background: #eef2f7;
 }
 
 .body {
@@ -73,10 +73,10 @@
 
 .name {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: var(--ps-text-title-sm);
+  font-weight: var(--ps-weight-medium);
   color: var(--ifmod-text);
-  line-height: 1.25;
+  line-height: var(--ps-leading-tight);
 }
 
 .check {
@@ -87,8 +87,9 @@
 
 .desc {
   margin: 0;
-  font-size: 0.85rem;
-  line-height: 1.4;
+  font-size: var(--ps-text-caption);
+  font-weight: var(--ps-weight-regular);
+  line-height: var(--ps-leading-normal);
   color: var(--ifmod-muted);
   display: -webkit-box;
   -webkit-line-clamp: 3;

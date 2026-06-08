@@ -531,7 +531,7 @@
 .modal {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 1100;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -548,6 +548,7 @@
   border-radius: 0.75rem;
   background: var(--ifmod-surface);
   box-shadow: 0 24px 56px rgba(15, 23, 42, 0.24);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .modalHeader {
@@ -649,6 +650,7 @@
   font-size: 0.9rem;
   font-weight: 800;
   cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .statusControls {
@@ -671,12 +673,16 @@
   gap: 0.45rem;
 }
 
+.statusButtonsDelivered {
+  grid-template-columns: 1fr;
+}
+
 .statusButton {
   min-height: 2.45rem;
   border: 1px solid var(--ifmod-border);
   border-radius: 0.55rem;
   background: #fff;
-  color: var(--ifmod-text);
+  color: var(--ifmod-muted);
   font: inherit;
   font-size: 0.82rem;
   font-weight: 800;
@@ -686,11 +692,30 @@
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.statusButton_pending {
+  background: rgba(251, 191, 36, 0.14);
+  border-color: rgba(217, 119, 6, 0.38);
+  color: #b45309;
+}
+
+.statusButton_preparing {
+  background: rgba(96, 165, 250, 0.14);
+  border-color: rgba(37, 99, 235, 0.34);
+  color: #1d4ed8;
+}
+
+.statusButton_delivered {
+  background: rgba(74, 222, 128, 0.14);
+  border-color: rgba(22, 163, 74, 0.34);
+  color: #15803d;
 }
 
 .statusButton:hover:not(:disabled) {
-  border-color: var(--ifmod-accent);
-  box-shadow: 0 0 0 3px rgba(24, 103, 154, 0.1);
+  filter: brightness(0.97);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06);
 }
 
 .statusButton:disabled {
@@ -698,7 +723,8 @@
 }
 
 .statusButtonActive {
-  box-shadow: inset 0 0 0 1px currentColor;
+  box-shadow: inset 0 0 0 2px currentColor;
+  cursor: default;
 }
 
 .close {
@@ -791,5 +817,57 @@
   .detailRow {
     grid-template-columns: 1fr;
     gap: 0.2rem;
+  }
+}
+
+/* iPad / tablet: modal above sidebar nav, richer hover + touch feedback */
+@media (max-width: 1024px) {
+  .modal {
+    padding: 0.85rem;
+    backdrop-filter: blur(2px);
+  }
+
+  .seat:active:not(.dimmedSeat) {
+    border-color: var(--ifmod-accent);
+    box-shadow: 0 0 0 3px rgba(24, 103, 154, 0.14);
+    transform: scale(0.97);
+  }
+
+  .close:active {
+    transform: scale(0.98);
+    background: rgba(24, 103, 154, 0.08);
+    border-color: var(--ifmod-accent);
+  }
+
+  .statusButton:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  @media (hover: hover) {
+    .modalCard:hover {
+      transform: translateY(-2px);
+      border-color: rgba(24, 103, 154, 0.28);
+      box-shadow: 0 28px 64px rgba(15, 23, 42, 0.3);
+    }
+
+    .seat:hover:not(.dimmedSeat) {
+      border-color: var(--ifmod-accent);
+      box-shadow: 0 0 0 3px rgba(24, 103, 154, 0.16), 0 10px 20px rgba(15, 23, 42, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .close:hover {
+      border-color: var(--ifmod-accent);
+      background: rgba(24, 103, 154, 0.06);
+      box-shadow: 0 0 0 3px rgba(24, 103, 154, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .statusButton:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: var(--ifmod-accent);
+      box-shadow: 0 0 0 3px rgba(24, 103, 154, 0.12);
+      filter: none;
+    }
   }
 }

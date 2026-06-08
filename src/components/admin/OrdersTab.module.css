@@ -306,49 +306,98 @@
   font-style: italic;
 }
 
+.notesBox {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid rgba(182, 57, 51, 0.2);
+  border-radius: 0.65rem;
+  background: rgba(254, 242, 242, 0.72);
+}
+
+.notesBox p {
+  margin: 0;
+  color: var(--ifmod-text);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .orderActions {
-  min-height: 3.85rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+  display: grid;
+  gap: 0.45rem;
   padding: 0.75rem 1rem;
   border-top: 1px solid rgba(29, 67, 106, 0.1);
   background: rgba(248, 250, 252, 0.7);
 }
 
-.nextStep {
+.statusControlLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   color: var(--ifmod-muted);
   font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: capitalize;
+  font-weight: 800;
 }
 
-.advanceButton {
+.statusButtons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.statusButtonsDelivered {
+  grid-template-columns: 1fr;
+}
+
+.statusButton {
   min-height: 2.45rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  background: #fff;
+  color: var(--ifmod-muted);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: capitalize;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  padding: 0 0.9rem;
-  border: 1px solid var(--ifmod-accent);
-  border-radius: 0.55rem;
-  background: var(--ifmod-accent);
-  color: #fff;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  gap: 0.35rem;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.advanceButton:hover:not(:disabled) {
-  background: #0e7a9a;
-  transform: translateY(-1px);
+.statusButton_pending {
+  background: rgba(251, 191, 36, 0.14);
+  border-color: rgba(217, 119, 6, 0.38);
+  color: #b45309;
 }
 
-.advanceButton:disabled {
-  opacity: 0.6;
+.statusButton_preparing {
+  background: rgba(96, 165, 250, 0.14);
+  border-color: rgba(37, 99, 235, 0.34);
+  color: #1d4ed8;
+}
+
+.statusButton_delivered {
+  background: rgba(74, 222, 128, 0.14);
+  border-color: rgba(22, 163, 74, 0.34);
+  color: #15803d;
+}
+
+.statusButton:hover:not(:disabled) {
+  filter: brightness(0.97);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06);
+}
+
+.statusButton:disabled {
   cursor: not-allowed;
+}
+
+.statusButtonActive {
+  box-shadow: inset 0 0 0 2px currentColor;
+  cursor: default;
 }
 
 .spin {
@@ -388,12 +437,4 @@
     min-height: 2.8rem;
   }
 
-  .orderActions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .advanceButton {
-    width: 100%;
-  }
 }

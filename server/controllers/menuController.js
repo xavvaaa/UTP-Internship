@@ -41,6 +41,19 @@ function validateColor(color) {
   return color
 }
 
+function resolveImageUrl(data = {}) {
+  return String(data.imageUrl ?? data.image ?? data.imageURL ?? '').trim()
+}
+
+function mapMenuDoc(doc) {
+  const data = doc.data()
+  return {
+    id: doc.id,
+    ...data,
+    imageUrl: resolveImageUrl(data),
+  }
+}
+
 function shapeMeal(body = {}) {
   const stock = normalizeStock(body.stock)
   const drinkIds = normalizeIdList(body.drinkIds)
@@ -81,7 +94,7 @@ export async function listMenu(req, res) {
   try {
     const snap = await adminDb.collection('menu').orderBy('name').get()
     const items = snap.docs
-      .map((item) => ({ id: item.id, ...item.data() }))
+      .map(mapMenuDoc)
       .filter((item) => {
         if (!filterId) return true
         const fid = String(item.flightId ?? '').trim()

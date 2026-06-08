@@ -19,10 +19,12 @@ function normalizeOrder(docSnap) {
     orderId: String(data.orderId ?? docSnap.id),
     sessionId: String(data.sessionId ?? ''),
     seatNumber: String(data.seatNumber ?? ''),
+    mealId: String(data.mealId ?? ''),
     meal: String(data.meal ?? ''),
     drink: String(data.drink ?? ''),
     dessert: String(data.dessert ?? ''),
     snack: String(data.snack ?? ''),
+    notes: String(data.notes ?? ''),
     status: String(data.status ?? 'pending').toLowerCase(),
     timestamp: data.timestamp ?? data.createdAt ?? null,
     updatedAt: data.updatedAt ?? null,
@@ -64,6 +66,7 @@ export async function placeOrderTransaction({
   drinkName,
   dessertName,
   snackName,
+  notes,
 }) {
   if (!sessionId || !seatNumber || !mealId) {
     throw new Error('Session, seat, and meal are required.')
@@ -80,6 +83,7 @@ export async function placeOrderTransaction({
     dessertName,
     snackId,
     snackName,
+    notes,
   }
 
   const res = await fetch('/api/order', {
