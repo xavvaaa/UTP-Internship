@@ -28,7 +28,7 @@ export default function ReportsTab({ orders, menuItems = [], summary, onRefresh 
       <div className={styles.hero}>
         <div>
           <p className={styles.eyebrow}>Analytics and decision support</p>
-          <h2 className={styles.heroTitle}>Flight meal report</h2>
+          <h2 className={styles.heroTitle}>SkyServe report</h2>
           <p className={styles.heroText}>
             Monitor meal trends, passenger preferences, and demand patterns to guide inventory planning and
             improve cabin operations.
@@ -208,7 +208,7 @@ function buildReport({ orders, menuItems, summary }) {
   })
   const completionRate = totalOrders ? Math.round((delivered / totalOrders) * 100) : 0
   const generatedAt = new Date().toLocaleString()
-  const fileBaseName = `skyserve-report-${new Date().toISOString().slice(0, 10)}`
+  const fileBaseName = 'skyserve'
 
   return {
     fileBaseName,
