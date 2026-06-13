@@ -1,0 +1,254 @@
+/* Flight Header Component Styles */
+.header {
+  background: var(--ifmod-surface);
+  color: var(--ifmod-text);
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--ifmod-border);
+}
+
+.headerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.primaryInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.flightSection {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.flightSection .icon {
+  color: var(--ifmod-accent);
+}
+
+.flightNumber {
+  font-size: var(--ps-text-title-lg);
+  font-weight: var(--ps-weight-strong);
+  margin: 0;
+  color: var(--ifmod-text);
+  letter-spacing: -0.01em;
+  line-height: var(--ps-leading-tight);
+}
+
+.route {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
+  color: var(--ifmod-muted);
+  margin-top: 0.25rem;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  flex-wrap: nowrap;
+  margin-left: auto;
+}
+
+.accessCode,
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.25rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 999px;
+  background: #f8fafc;
+  color: var(--ifmod-text);
+}
+
+.accessLabel {
+  color: var(--ifmod-muted);
+  font-size: var(--ps-text-label);
+  font-weight: var(--ps-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.accessCode strong,
+.statusPill strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+}
+
+.statusPill.active {
+  color: var(--ifmod-success);
+}
+
+.statusPill.inactive {
+  color: var(--ifmod-danger);
+}
+
+.secondaryInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
+  color: var(--ifmod-muted);
+}
+
+.timeInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Compact variant */
+.compact {
+  padding: 0.75rem 1rem;
+  background: var(--ifmod-surface);
+}
+
+.compactContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.flightInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.compactMeta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  flex-wrap: nowrap;
+  margin-left: auto;
+}
+
+.compact .flightNumber {
+  font-size: var(--ps-text-title);
+  font-weight: var(--ps-weight-medium);
+}
+
+.compact .route {
+  font-size: var(--ps-text-body);
+  margin-top: 0;
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 0.8;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Error state */
+.error {
+  background: #fef2f2;
+  color: var(--ifmod-danger);
+}
+
+.errorContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .primaryInfo {
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .headerActions {
+    max-width: none;
+    margin-left: auto;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .accessCode,
+  .statusPill {
+    min-height: 2.1rem;
+    padding: 0.4rem 0.65rem;
+  }
+  
+  .secondaryInfo {
+    display: none;
+  }
+  
+  .flightNumber {
+    font-size: 1.05rem;
+  }
+  
+  .compactContent {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .compactMeta {
+    width: auto;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .primaryInfo {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .headerActions,
+  .compactMeta {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

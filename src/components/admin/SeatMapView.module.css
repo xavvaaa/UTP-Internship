@@ -1,0 +1,175 @@
+.wrap {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.cabin {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.9rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+    #0f1622;
+}
+
+.headerRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(2.4rem, auto) repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.colLabel,
+.aisleLabel,
+.rowLabel {
+  color: var(--ifmod-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(2.4rem, auto) repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.seat {
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  min-height: 2.3rem;
+  padding: 0.35rem 0.25rem;
+  font: inherit;
+  cursor: pointer;
+  background: #111722;
+  color: var(--ifmod-text);
+}
+
+.rowLabel {
+  font-size: 0.72rem;
+}
+
+.active {
+  outline: 2px solid var(--ifmod-accent);
+  outline-offset: 1px;
+}
+
+.empty {
+  background: #111722;
+}
+
+.pending {
+  background: rgba(251, 191, 36, 0.2);
+}
+
+.preparing {
+  background: rgba(96, 165, 250, 0.25);
+}
+
+.delivered {
+  background: rgba(74, 222, 128, 0.2);
+}
+
+.rearSection {
+  display: grid;
+  gap: 0.85rem;
+  padding-top: 0.35rem;
+}
+
+.rearTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.utilityBlock,
+.galley,
+.service {
+  display: grid;
+  place-items: center;
+  gap: 0.3rem;
+  min-height: 4.4rem;
+  padding: 0.55rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+  color: var(--ifmod-muted);
+  background: rgba(255, 255, 255, 0.02);
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.utilityBlock {
+  width: min(5.1rem, 100%);
+}
+
+.galleyRow {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 0.75rem;
+}
+
+.icon {
+  width: 1.65rem;
+  height: 1.65rem;
+  fill: currentColor;
+}
+
+.backLabel {
+  text-align: center;
+  color: #8aa0b8;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  color: var(--ifmod-muted);
+  font-size: 0.78rem;
+}
+
+.legend > span {
+  border: 1px solid var(--ifmod-border);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .cabin {
+    padding: 0.75rem;
+  }
+
+  .headerRow,
+  .grid {
+    gap: 0.3rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 2rem repeat(3, minmax(0, 1fr));
+  }
+
+  .seat {
+    min-height: 2.1rem;
+    font-size: 0.76rem;
+  }
+
+  .rearTop,
+  .galleyRow {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .utilityBlock {
+    width: 100%;
+  }
+}

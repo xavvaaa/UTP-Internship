@@ -1,0 +1,670 @@
+/* Main container */
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--ifmod-bg);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboardHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(16rem, 0.9fr);
+  gap: 1rem;
+  align-items: stretch;
+  padding: 1rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 1rem;
+  background: var(--ifmod-surface);
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.eyebrow {
+  color: var(--ifmod-accent);
+  font-size: var(--ps-text-label);
+  font-weight: var(--ps-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: var(--ps-leading-tight);
+}
+
+.heroCopy h2 {
+  margin: 0.25rem 0;
+  color: var(--ifmod-text);
+  font-size: var(--ps-text-display);
+  font-weight: var(--ps-weight-strong);
+  line-height: var(--ps-leading-tight);
+  letter-spacing: -0.03em;
+}
+
+.heroCopy p {
+  max-width: 36rem;
+  margin: 0;
+  color: var(--ifmod-muted);
+  font-size: var(--ps-text-body-lg);
+  font-weight: var(--ps-weight-regular);
+  line-height: var(--ps-leading-normal);
+}
+
+.heroCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.heroCard {
+  min-height: 4.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.8rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.8rem;
+  background: #f8fafc;
+}
+
+.heroLabel {
+  color: var(--ifmod-muted);
+  font-size: var(--ps-text-label);
+  font-weight: var(--ps-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: var(--ps-leading-tight);
+}
+
+.heroCard strong {
+  color: var(--ifmod-text);
+  font-size: var(--ps-text-title-lg);
+  font-weight: var(--ps-weight-strong);
+  line-height: 1;
+}
+
+.goodCard {
+  border-color: rgba(22, 163, 74, 0.22);
+  background: #f0fdf4;
+}
+
+.warnCard {
+  border-color: rgba(220, 38, 38, 0.2);
+  background: #fef2f2;
+}
+
+/* Loading state */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: 1rem;
+}
+
+.loadingState h2 {
+  font-size: var(--ps-text-title-lg);
+  font-weight: var(--ps-weight-medium);
+  color: var(--ifmod-text);
+  margin: 0;
+}
+
+.loadingState p {
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
+  color: var(--ifmod-muted);
+  margin: 0;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+  color: var(--ifmod-accent);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Error state */
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.errorIcon {
+  color: #dc2626;
+}
+
+.errorState h2 {
+  font-size: var(--ps-text-title-lg);
+  font-weight: var(--ps-weight-medium);
+  color: var(--ifmod-text);
+  margin: 0;
+}
+
+.errorState p {
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
+  color: var(--ifmod-muted);
+  margin: 0;
+  max-width: 400px;
+}
+
+.errorActions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--ps-radius-sm);
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-medium);
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.primaryBtn {
+  background: var(--ifmod-accent);
+  color: white;
+}
+
+.primaryBtn:hover {
+  background: #6366f1;
+}
+
+.secondaryBtn {
+  background: var(--ifmod-surface);
+  color: var(--ifmod-text);
+  border: 1px solid var(--ifmod-border);
+}
+
+.secondaryBtn:hover {
+  background: var(--ifmod-bg);
+}
+
+/* Flight information */
+.flightInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--ifmod-surface);
+  border-radius: 0.9rem;
+  padding: 0.95rem 1rem;
+  margin-bottom: 0;
+  border: 1px solid var(--ifmod-border);
+  box-shadow: 0 8px 24px rgba(21, 38, 57, 0.04);
+}
+
+.flightSummary {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.flightIcon {
+  color: var(--ifmod-accent);
+}
+
+.flightTitle {
+  font-size: var(--ps-text-title-sm);
+  font-weight: var(--ps-weight-medium);
+  color: var(--ifmod-text);
+  margin: 0;
+}
+
+.flightRoute {
+  margin: 0.2rem 0 0;
+  color: var(--ifmod-muted);
+  font-size: var(--ps-text-caption);
+  font-weight: var(--ps-weight-regular);
+}
+
+.flightDetails {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.flightDetail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 999px;
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.flightLabel {
+  font-size: var(--ps-text-label);
+  font-weight: var(--ps-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ifmod-muted);
+}
+
+.flightValue {
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
+  color: var(--ifmod-text);
+}
+
+.flightValue.active {
+  color: #059669;
+}
+
+.flightValue.inactive {
+  color: #dc2626;
+}
+
+.menuPanel {
+  padding: 1rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.9rem;
+  background: var(--ifmod-surface);
+}
+
+.menuPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.menuTitle {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.menuTitle h3 {
+  margin: 0;
+  color: var(--ifmod-text);
+  font-size: var(--ps-text-title-sm);
+  font-weight: var(--ps-weight-medium);
+}
+
+.menuTitle p {
+  margin: 0.2rem 0 0;
+  color: var(--ifmod-muted);
+  font-size: var(--ps-text-caption);
+  font-weight: var(--ps-weight-regular);
+}
+
+.toolbarIcon {
+  color: var(--ifmod-accent);
+  display: flex;
+  margin-top: 0.1rem;
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
+  color: var(--ifmod-muted);
+  line-height: var(--ps-leading-normal);
+}
+
+.searchBox {
+  position: relative;
+  flex: 0 1 20rem;
+}
+
+.searchBox svg {
+  position: absolute;
+  left: 0.8rem;
+  top: 50%;
+  color: var(--ifmod-muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.searchBox input {
+  width: 100%;
+  min-height: 2.9rem;
+  padding: 0 0.85rem 0 2.35rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: var(--ps-radius-sm);
+  background: var(--ifmod-surface);
+  color: var(--ifmod-text);
+  font: inherit;
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
+}
+
+.searchBox input:focus {
+  outline: 2px solid rgba(24, 103, 154, 0.2);
+  border-color: var(--ifmod-accent);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.item {
+  margin: 0;
+}
+
+.choiceGroup {
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.choiceTitle {
+  margin: 0;
+  font-size: var(--ps-text-title-sm);
+  font-weight: var(--ps-weight-medium);
+  color: var(--ifmod-text);
+}
+
+.choices {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ifmod-muted);
+  background: var(--ifmod-surface);
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.55rem;
+}
+
+.centerMuted {
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-regular);
+  color: var(--ifmod-muted);
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.alert {
+  margin: 0 0 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.875rem;
+  color: var(--ifmod-danger);
+}
+
+.emptyHint {
+  margin: 0.5rem 0 1rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: var(--ps-radius-sm);
+  border: 1px solid var(--ifmod-border);
+  background: var(--ifmod-surface);
+  font-size: var(--ps-text-body);
+  line-height: var(--ps-leading-normal);
+}
+.emptyTitle {
+  margin: 0 0 0.4rem;
+  font-weight: var(--ps-weight-medium);
+  color: var(--ifmod-text);
+}
+.emptyBody {
+  margin: 0;
+  font-weight: var(--ps-weight-regular);
+  color: var(--ifmod-muted);
+}
+.code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.82em;
+  color: var(--ifmod-accent);
+}
+
+.sections {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.6rem;
+}
+
+.grabList {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 0.85rem;
+}
+
+.grabItem {
+  margin: 0;
+}
+
+.seatForm {
+  margin-bottom: 0.9rem;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.7rem;
+  background: var(--ifmod-surface);
+}
+
+.seatRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.seatIcon {
+  color: var(--ifmod-accent);
+  display: flex;
+  padding: 0.45rem 0 0.35rem;
+}
+
+.seatLabel {
+  flex: 1;
+  display: grid;
+  gap: 0.25rem;
+  font-size: var(--ps-text-caption);
+  font-weight: var(--ps-weight-regular);
+  color: var(--ifmod-muted);
+}
+
+.seatInput {
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  background: #fff;
+  color: var(--ifmod-text);
+  padding: 0.45rem 0.55rem;
+  font: inherit;
+  text-transform: uppercase;
+}
+
+.seatBtn {
+  border: 1px solid var(--ifmod-border);
+  background: var(--ifmod-accent);
+  color: #fff;
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.65rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.seatErr {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--ifmod-danger);
+}
+
+.seatSection {
+  margin-bottom: 1.2rem;
+  padding: 0.8rem 0.9rem;
+  border: 2px solid var(--ifmod-accent);
+  border-radius: 0.8rem;
+  background: var(--ifmod-surface);
+}
+
+.seatConfirmation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.seatInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.seatInfoIcon {
+  color: var(--ifmod-accent);
+  display: flex;
+  font-size: 1.2rem;
+}
+
+.seatInfoText {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.seatInfoLabel {
+  margin: 0;
+  font-size: var(--ps-text-caption);
+  color: var(--ifmod-muted);
+  font-weight: var(--ps-weight-regular);
+}
+
+.seatInfoValue {
+  margin: 0;
+  font-size: var(--ps-text-title-sm);
+  color: var(--ifmod-text);
+  font-weight: var(--ps-weight-medium);
+}
+
+.seatActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.seatActionBtn {
+  border: 1px solid var(--ifmod-border);
+  background: var(--ifmod-surface);
+  color: var(--ifmod-text);
+  border-radius: 0.55rem;
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seatActionBtn:hover {
+  background: var(--ifmod-accent);
+  color: #fff;
+  border-color: var(--ifmod-accent);
+}
+
+.clearSearch {
+  width: fit-content;
+  margin-top: 0.75rem;
+  border: 1px solid var(--ifmod-accent);
+  background: var(--ifmod-accent);
+  color: #fff;
+  border-radius: var(--ps-radius-sm);
+  padding: 0.55rem 0.8rem;
+  font: inherit;
+  font-size: var(--ps-text-body);
+  font-weight: var(--ps-weight-medium);
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .dashboardHero,
+  .flightInfo,
+  .menuPanelHeader {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .heroCards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .flightDetails {
+    justify-content: flex-start;
+  }
+
+  .searchBox {
+    flex-basis: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .heroCards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .grabList {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCard {
+    min-height: 4.2rem;
+    padding: 0.6rem 0.45rem;
+  }
+
+  .heroLabel {
+    font-size: 0.64rem;
+  }
+
+  .heroCard strong {
+    font-size: 1rem;
+  }
+
+  .dashboardHero,
+  .menuPanel,
+  .flightInfo {
+    border-radius: 0.8rem;
+  }
+}

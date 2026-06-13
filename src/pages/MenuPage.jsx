@@ -1,0 +1,217 @@
+/**
+ * Passenger menu dashboard with flight context, meal search, and live order status.
+ */
+import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { AlertCircle, Loader2, LogOut, Search, UtensilsCrossed } from 'lucide-react'
+import PageShell from '../components/layout/PageShell'
+import FlightHeader from '../components/layout/FlightHeader'
+import GrabMenuRow from '../components/passenger/GrabMenuRow'
+import StatusTracker from '../components/passenger/StatusTracker'
+import ConfirmDialog from '../components/common/ConfirmDialog'
+import { useSession } from '../context/useSession'
+import { firebaseConfigured } from '../firebase/config'
+import { usePassengerMenu } from '../hooks/usePassengerMenu'
+import { useOrderForSession } from '../hooks/useOrderForSession'
+import styles from './MenuPage.module.css'
+
+export default function MenuPage() {
+  const navigate = useNavigate()
+  const {
+    sessionId,
+    seatNumber,
+    clearSession,
+    flightNumber,
+    loading: sessionLoading,
+    error: sessionError,
+  } = useSession()
+  const { menuItems, menuLoading, menuError } = usePassengerMenu(sessionId)
+  const { liveOrder, orderSubError } = useOrderForSession(sessionId, seatNumber)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
+
+  const meals = useMemo(() => {
+    const list = menuItems.filter((m) => String(m.category || 'meal').toLowerCase() === 'meal')
+    return [...list].sort((a, b) => String(a.name).localeCompare(String(b.name)))
+  }, [menuItems])
+
+  const visibleMeals = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase()
+    if (!query) return meals
+    return meals.filter((item) =>
+      [item.name, item.description, ...(item.allergens || [])]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(query),
+    )
+  }, [meals, searchQuery])
+
+  function handleLeave() {
+    setShowExitConfirm(true)
+  }
+
+  function confirmLeave() {
+    clearSession()
+    navigate('/')
+  }
+
+  function openCustomize(mealId) {
+    navigate(`/menu/customize/${mealId}`)
+  }
+
+  const orderLocked = Boolean(liveOrder)
+
+  if (sessionLoading) {
+    return (
+      <div className={styles.container}>
+        <FlightHeader compact />
+        <div className={styles.loadingState}>
+          <Loader2 className={styles.spin} size={24} />
+          <h2>Loading flight information...</h2>
+          <p>Preparing your meal ordering experience</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (sessionError || !sessionId) {
+    return (
+      <div className={styles.container}>
+        <FlightHeader compact />
+        <div className={styles.errorState}>
+          <AlertCircle size={32} className={styles.errorIcon} />
+          <h2>Session error</h2>
+          <p>{sessionError || 'No valid session found'}</p>
+          <div className={styles.errorActions}>
+            <button className={styles.primaryBtn} onClick={() => navigate('/')}>
+              Back to Home
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.container}>
+      <FlightHeader />
+
+      <div className={styles.content}>
+        <PageShell
+          title="Choose your meal"
+          subtitle={flightNumber ? `Flight ${flightNumber} dining for seat ${seatNumber}` : 'In-flight dining'}
+          actions={
+            <button
+              type="button"
+              className="ifmod-icon-btn"
+              onClick={handleLeave}
+              aria-label="End session"
+            >
+              <LogOut size={18} strokeWidth={2} />
+            </button>
+          }
+        >
+          {!orderLocked ? (
+            <section className={styles.menuPanel}>
+              <div className={styles.menuPanelHeader}>
+                <div className={styles.menuTitle}>
+                  <span className={styles.toolbarIcon} aria-hidden>
+                    <UtensilsCrossed size={18} strokeWidth={2} />
+                  </span>
+                  <div>
+                    <h3>Available meals</h3>
+                    <p>
+                      {meals.length
+                        ? `${meals.length} meals ready for this flight`
+                        : 'Meals will appear here once crew adds them.'}
+                    </p>
+                  </div>
+                </div>
+                <label className={styles.searchBox}>
+                  <Search size={16} aria-hidden />
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Search meal, ingredient, allergen"
+                  />
+                </label>
+              </div>
+            </section>
+          ) : null}
+
+          {!firebaseConfigured ? (
+            <p className={styles.alert} role="alert">
+              <AlertCircle size={18} aria-hidden />
+              Connect Firebase (see .env.example).
+            </p>
+          ) : null}
+
+          {menuError && firebaseConfigured ? (
+            <p className={styles.alert} role="alert">
+              <AlertCircle size={18} aria-hidden />
+              {menuError}
+            </p>
+          ) : null}
+
+          {orderSubError ? (
+            <p className={styles.alert} role="alert">
+              <AlertCircle size={18} aria-hidden />
+              {orderSubError}
+            </p>
+          ) : null}
+
+          {liveOrder ? <StatusTracker order={liveOrder} menuItems={menuItems} /> : null}
+
+          {!orderLocked && !menuLoading && firebaseConfigured ? (
+            <ul className={styles.grabList}>
+              {visibleMeals.map((item) => (
+                <li key={item.id} className={styles.grabItem}>
+                  <GrabMenuRow item={item} onOpen={openCustomize} disabled={orderLocked} />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          {!orderLocked && !menuLoading && meals.length > 0 && visibleMeals.length === 0 && firebaseConfigured ? (
+            <div className={styles.emptyHint}>
+              <p className={styles.emptyTitle}>No meals match your search.</p>
+              <p className={styles.emptyBody}>Try a different meal name, ingredient, or allergen.</p>
+              <button type="button" className={styles.clearSearch} onClick={() => setSearchQuery('')}>
+                Clear search
+              </button>
+            </div>
+          ) : null}
+
+          {menuLoading && firebaseConfigured && !menuError ? (
+            <p className={styles.centerMuted}>
+              <Loader2 className={styles.spin} size={18} aria-hidden />
+              Loading menu
+            </p>
+          ) : null}
+
+          {!menuLoading && !meals.length && firebaseConfigured && !menuError ? (
+            <div className={styles.emptyHint}>
+              <p className={styles.emptyTitle}>No meals listed for this flight.</p>
+              <p className={styles.emptyBody}>
+                Crew can add menu items in the dashboard for flight instance{' '}
+                <code className={styles.code}>{sessionId?.slice(0, 8)}...</code>
+              </p>
+            </div>
+          ) : null}
+          <ConfirmDialog
+            isOpen={showExitConfirm}
+            title="Exit passenger session?"
+            message="Are you sure you want to exit? This will remove your saved flight and seat from this device, so you will need the access code again to rejoin."
+            confirmText="Exit session"
+            cancelText="Stay here"
+            type="warning"
+            onConfirm={confirmLeave}
+            onCancel={() => setShowExitConfirm(false)}
+          />
+        </PageShell>
+      </div>
+    </div>
+  )
+}

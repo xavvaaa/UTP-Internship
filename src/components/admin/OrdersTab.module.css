@@ -1,0 +1,440 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(8rem, 1fr));
+  gap: 0.75rem;
+}
+
+.summaryCard {
+  min-height: 4.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+  background: var(--ifmod-surface);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.summaryValue {
+  color: var(--ifmod-text);
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.summaryLabel {
+  color: var(--ifmod-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.pendingSummary {
+  border-color: rgba(217, 119, 6, 0.24);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.pendingSummary .summaryValue {
+  color: #b45309;
+}
+
+.preparingSummary {
+  border-color: rgba(37, 99, 235, 0.22);
+  background: rgba(96, 165, 250, 0.08);
+}
+
+.preparingSummary .summaryValue {
+  color: #1d4ed8;
+}
+
+.deliveredSummary {
+  border-color: rgba(22, 163, 74, 0.22);
+  background: rgba(74, 222, 128, 0.08);
+}
+
+.deliveredSummary .summaryValue {
+  color: #15803d;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: minmax(16rem, 1.4fr) repeat(2, minmax(10rem, 0.8fr)) auto;
+  gap: 0.75rem;
+  align-items: end;
+  padding: 1rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.75rem;
+  background: var(--ifmod-surface);
+}
+
+.searchControl,
+.filterControl {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--ifmod-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.searchInputWrap {
+  position: relative;
+}
+
+.searchInputWrap svg {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  color: var(--ifmod-muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.searchInputWrap input,
+.filterControl select {
+  width: 100%;
+  min-height: 2.5rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  background: #fff;
+  color: var(--ifmod-text);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0 0.75rem;
+}
+
+.searchInputWrap input {
+  padding-left: 2.25rem;
+}
+
+.searchInputWrap input:focus,
+.filterControl select:focus {
+  outline: 2px solid rgba(24, 103, 154, 0.25);
+  border-color: var(--ifmod-accent);
+}
+
+.clearButton {
+  min-height: 2.5rem;
+  padding: 0 0.9rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  background: #fff;
+  color: var(--ifmod-text);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.clearButton:hover {
+  border-color: var(--ifmod-accent);
+}
+
+.ordersList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  padding: 2.5rem 1rem;
+  border: 2px dashed var(--ifmod-border);
+  border-radius: 0.75rem;
+  background: rgba(24, 103, 154, 0.02);
+  color: var(--ifmod-muted);
+  text-align: center;
+}
+
+.emptyState strong {
+  color: var(--ifmod-text);
+  font-size: 1rem;
+}
+
+.emptyState p {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.emptyAction {
+  margin-top: 0.6rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--ifmod-accent);
+  border-radius: 0.55rem;
+  background: var(--ifmod-accent);
+  color: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.orderCard {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.8rem;
+  background: var(--ifmod-surface);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.orderCard:hover {
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.orderHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(29, 67, 106, 0.1);
+}
+
+.orderIdentity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.seatNumber {
+  min-width: 3.2rem;
+  min-height: 3.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  border: 1px solid rgba(24, 103, 154, 0.2);
+  border-radius: 0.7rem;
+  background: rgba(24, 103, 154, 0.08);
+  color: var(--ifmod-accent);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.orderId {
+  overflow: hidden;
+  color: var(--ifmod-text);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orderTime {
+  margin-top: 0.2rem;
+  color: var(--ifmod-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.orderDetails {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  flex: 1;
+}
+
+.mealRow {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.detailLabel {
+  color: var(--ifmod-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.mealValue {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ifmod-text);
+  font-size: 0.95rem;
+}
+
+.mealColorIndicator {
+  width: 0.7rem;
+  height: 0.7rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 999px;
+}
+
+.optionList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.optionChip {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 999px;
+  background: rgba(24, 103, 154, 0.04);
+  color: var(--ifmod-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.noOptions {
+  color: var(--ifmod-muted);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.notesBox {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid rgba(182, 57, 51, 0.2);
+  border-radius: 0.65rem;
+  background: rgba(254, 242, 242, 0.72);
+}
+
+.notesBox p {
+  margin: 0;
+  color: var(--ifmod-text);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.orderActions {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(29, 67, 106, 0.1);
+  background: rgba(248, 250, 252, 0.7);
+}
+
+.statusControlLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--ifmod-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.statusButtons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.statusButtonsDelivered {
+  grid-template-columns: 1fr;
+}
+
+.statusButton {
+  min-height: 2.45rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.55rem;
+  background: #fff;
+  color: var(--ifmod-muted);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: capitalize;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.statusButton_pending {
+  background: rgba(251, 191, 36, 0.14);
+  border-color: rgba(217, 119, 6, 0.38);
+  color: #b45309;
+}
+
+.statusButton_preparing {
+  background: rgba(96, 165, 250, 0.14);
+  border-color: rgba(37, 99, 235, 0.34);
+  color: #1d4ed8;
+}
+
+.statusButton_delivered {
+  background: rgba(74, 222, 128, 0.14);
+  border-color: rgba(22, 163, 74, 0.34);
+  color: #15803d;
+}
+
+.statusButton:hover:not(:disabled) {
+  filter: brightness(0.97);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06);
+}
+
+.statusButton:disabled {
+  cursor: not-allowed;
+}
+
+.statusButtonActive {
+  box-shadow: inset 0 0 0 2px currentColor;
+  cursor: default;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .summaryGrid,
+  .ordersList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .summaryGrid,
+  .controls,
+  .ordersList {
+    grid-template-columns: 1fr;
+  }
+
+  .orderHeader {
+    gap: 0.65rem;
+  }
+
+  .seatNumber {
+    min-width: 2.8rem;
+    min-height: 2.8rem;
+  }
+
+}

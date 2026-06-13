@@ -1,0 +1,208 @@
+/* Dashboard Header */
+.dashboardHeader {
+  margin-bottom: 2rem;
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ifmod-text);
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--ifmod-muted);
+  line-height: 1.4;
+}
+
+/* Actions in header */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Status Alert */
+.statusAlert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(182, 57, 51, 0.1);
+  border: 1px solid rgba(182, 57, 51, 0.2);
+  border-radius: 0.5rem;
+  color: var(--ifmod-danger);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* Tab Navigation - Modern and Clean */
+.tabNavigation {
+  margin-bottom: 1.5rem;
+}
+
+.tabList {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--ifmod-border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabButton {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--ifmod-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+.tabButton:hover:not(:disabled) {
+  color: var(--ifmod-text);
+  background: rgba(24, 103, 154, 0.05);
+}
+
+.tabActive {
+  color: var(--ifmod-accent);
+  border-bottom-color: var(--ifmod-accent);
+  background: rgba(24, 103, 154, 0.05);
+}
+
+.tabDisabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Messages */
+.message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.message[data-type="error"] {
+  background: rgba(182, 57, 51, 0.1);
+  border: 1px solid rgba(182, 57, 51, 0.2);
+  color: var(--ifmod-danger);
+}
+
+.message[data-type="success"] {
+  background: rgba(28, 120, 99, 0.1);
+  border: 1px solid rgba(28, 120, 99, 0.2);
+  color: var(--ifmod-success);
+}
+
+.message[data-type="info"] {
+  background: rgba(24, 103, 154, 0.1);
+  border: 1px solid rgba(24, 103, 154, 0.2);
+  color: var(--ifmod-accent);
+}
+
+/* Tab Content */
+.tabContent {
+  padding: 0;
+  width: 100%;
+  max-width: none;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .tabButton {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .message {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabList {
+    gap: 0.125rem;
+  }
+
+  .tabButton {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Instruction Area */
+.instructionArea {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.instructionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ifmod-text);
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instructionTitle svg {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+.instructionContent {
+  font-size: 13px;
+  color: var(--ifmod-text);
+  line-height: 1.5;
+}
+
+.instructionContent p {
+  margin: 0 0 8px 0;
+}
+
+.instructionContent ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.instructionContent li {
+  margin-bottom: 4px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.instructionContent li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--ifmod-primary);
+  font-weight: bold;
+}
