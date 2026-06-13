@@ -537,6 +537,107 @@
   color: var(--ifmod-muted);
 }
 
+.selectedCount {
+  flex-shrink: 0;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ifmod-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.presetSection {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.7rem;
+  background: #fff;
+}
+
+.presetHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.presetHeading span {
+  color: var(--ifmod-text);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.presetHeading small {
+  color: var(--ifmod-muted);
+  font-size: 0.75rem;
+}
+
+.presetGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.presetOption {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.6rem;
+  background: #fff;
+  color: var(--ifmod-text);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.presetOption:hover:not(:disabled) {
+  border-color: var(--ifmod-accent);
+  background: rgba(24, 103, 154, 0.05);
+}
+
+.presetOption:focus-visible {
+  outline: 2px solid rgba(24, 103, 154, 0.3);
+  outline-offset: 2px;
+}
+
+.presetOption:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.presetSelected {
+  border-color: var(--ifmod-accent);
+  background: rgba(24, 103, 154, 0.09);
+  color: var(--ifmod-accent);
+}
+
+.presetCheck {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ifmod-border);
+  border-radius: 0.3rem;
+  background: #fff;
+}
+
+.presetSelected .presetCheck {
+  border-color: var(--ifmod-accent);
+  background: var(--ifmod-accent);
+  color: #fff;
+}
+
 .optionList {
   display: grid;
   gap: 0.5rem;
@@ -1217,6 +1318,24 @@ select {
 
   .formActions {
     flex-direction: column;
+  }
+
+  .optionSectionHeader,
+  .presetHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .presetGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .optionInputRow {
+    grid-template-columns: 1fr;
+  }
+
+  .optionAddButton {
+    width: 100%;
   }
 
   .cancelButton,

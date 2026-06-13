@@ -75,6 +75,15 @@ export function getSeatLayoutOption(layoutId) {
   }
 }
 
+export function getSeatLayoutOptionForAircraft(aircraftType) {
+  const normalized = String(aircraftType ?? '').trim().toUpperCase()
+  const layout = SEAT_LAYOUTS.find(({ aircraftType: supportedType }) => {
+    const supported = supportedType.toUpperCase()
+    return normalized === supported || normalized.startsWith(supported.split('-')[0])
+  })
+  return layout ? getSeatLayoutOption(layout.id) : null
+}
+
 function rangeRows(start, end, ...sections) {
   return Array.from({ length: end - start + 1 }, (_value, index) => ({
     number: start + index,

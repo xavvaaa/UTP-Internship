@@ -20,7 +20,7 @@ import styles from './MenuCustomizePage.module.css'
 
 const CATEGORY_ORDER = ['drink', 'dessert', 'snack']
 function buildRadioOptions(items) {
-  const opts = [{ value: '', label: 'None', disabled: false }]
+  const opts = [{ value: '', label: 'Water', disabled: false }]
   for (const item of items) {
     const ok = item.isInlineOption ? true : isItemSelectable(item)
     opts.push({

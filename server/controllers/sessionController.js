@@ -41,6 +41,28 @@ function parseFlightNumber(value) {
   return { flightIata: normalized, airlineIata: match[1], number: match[2] }
 }
 
+function normalizeAircraftType(value) {
+  const normalized = String(value ?? '').trim().toUpperCase().replace(/\s+/g, '')
+  const aliases = {
+    '32A': 'A320',
+    '32N': 'A320',
+    A20N: 'A320',
+    '321': 'A321',
+    '32B': 'A321',
+    '32Q': 'A321',
+    A21N: 'A321',
+    '333': 'A330-300',
+    A333: 'A330-300',
+    '738': 'B737-800',
+    B738: 'B737-800',
+    '77W': 'B777-300',
+    B77W: 'B777-300',
+    '789': 'B787-9',
+    B789: 'B787-9',
+  }
+  return aliases[normalized] || normalized
+}
+
 function readRouteFromItem(item) {
   const dep =
     item?.departure?.iata ||
@@ -56,10 +78,30 @@ function readRouteFromItem(item) {
   if (!dep || !arr) return null
   const departure = String(dep).toUpperCase()
   const arrival = String(arr).toUpperCase()
-  const scheduled = item?.departure?.scheduled || item?.departure?.scheduledTime || ''
+  const scheduled =
+    item?.departure?.scheduled ||
+    item?.departure?.scheduledTime ||
+    item?.departure_time ||
+    ''
   const flightDate = item?.flight_date || ''
-  const departureTime = scheduled ? String(scheduled).slice(11, 16) : ''
-  return { route: `${departure}-${arrival}`, departure, arrival, departure_time: departureTime, flight_date: flightDate }
+  const scheduledText = String(scheduled)
+  const departureTime = scheduledText.includes('T')
+    ? scheduledText.slice(11, 16)
+    : scheduledText.slice(0, 5)
+  const aircraftType = normalizeAircraftType(
+    item?.aircraft?.iata ||
+    item?.aircraft?.icao ||
+    item?.aircraft_type ||
+    item?.aircraft?.type
+  )
+  return {
+    route: `${departure}-${arrival}`,
+    departure,
+    arrival,
+    departure_time: departureTime,
+    flight_date: flightDate,
+    aircraft_type: aircraftType,
+  }
 }
 
 async function fetchAviationstack(path, params) {
@@ -268,39 +310,36 @@ export async function resolveSession(req, res) {
 }
 
 /**
- * GET /api/session/route-lookup?flight_number=MH123&date=YYYY-MM-DD
+ * GET /api/session/route-lookup?flight_number=MH123
  */
 export async function lookupFlightRoute(req, res) {
   try {
-    const flightNumber = String(req.query.flight_number ?? '').trim().toUpperCase()
-    const date = String(req.query.date ?? '').trim()
+    const parsed = parseFlightNumber(req.query.flight_number)
+    const flightNumber = parsed.flightIata
 
     if (!flightNumber) {
       return res.status(400).json({ error: 'flight_number is required' })
     }
-    if (!date) {
-      return res.status(400).json({ error: 'date is required' })
-    }
 
-    const parsed = parseFlightNumber(flightNumber)
     try {
       const flightResults = await fetchAviationstack('flights', {
         flight_iata: parsed.flightIata,
         flight_num: parsed.number,
-        limit: '1',
+        limit: '10',
       })
-      const flightRoute = flightResults.map(readRouteFromItem).find(Boolean)
+      const flightRoute = flightResults
+        .map(readRouteFromItem)
+        .find(Boolean)
       if (flightRoute) {
         return res.json({ ok: true, source: 'flights', ...flightRoute })
       }
     } catch (error) {
       if (!isPlanUnsupported(error)) throw error
-      return res.status(403).json({
-        error: 'Your Aviationstack subscription does not support real-time flight lookup. Enter the route manually or upgrade the API plan.',
-      })
     }
 
-    return res.status(404).json({ error: 'No active real-time flight found. Enter the route manually.' })
+    return res.status(404).json({
+      error: `No current flight data returned for ${flightNumber}. The free Aviationstack plan only provides flights available in its real-time feed.`,
+    })
   } catch (error) {
     console.error('lookupFlightRoute:', error)
     return res.status(error.status || 500).json({ error: error.message || 'Failed to look up route' })

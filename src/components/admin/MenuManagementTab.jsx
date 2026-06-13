@@ -1,7 +1,18 @@
 import { useMemo, useState } from 'react'
-import { CheckCircle2, Loader2, Pencil, Trash2, Upload, Plus, AlertTriangle, X } from 'lucide-react'
+import { Check, CheckCircle2, Loader2, Pencil, Trash2, Upload, Plus, AlertTriangle, X } from 'lucide-react'
 import { useToast } from '../../context/useToast'
 import styles from './MenuManagementTab.module.css'
+
+const PREDEFINED_DRINKS = [
+  'Sparkling Water',
+  'Coffee',
+  'Tea',
+  'Orange Juice',
+  'Apple Juice',
+  'Cola',
+  'Diet Cola',
+  'Sprite',
+]
 
 const EMPTY_FORM = {
   name: '',
@@ -201,11 +212,36 @@ export default function MenuManagementTab({
     const propertyKey = type === 'allergen' ? 'allergens' : `${type}Options`
     const currentArray = prev => Array.isArray(prev[propertyKey]) ? prev[propertyKey] : []
     
-    setForm((prev) => ({
-      ...prev,
-      [propertyKey]: [...currentArray(prev), draft],
-    }))
+    setForm((prev) => {
+      const options = currentArray(prev)
+      const alreadyAdded = options.some(
+        (option) => String(option).trim().toLowerCase() === draft.toLowerCase(),
+      )
+      if (alreadyAdded) return prev
+
+      return {
+        ...prev,
+        [propertyKey]: [...options, draft],
+      }
+    })
     setNewOption((prev) => ({ ...prev, [type]: '' }))
+  }
+
+  function togglePredefinedDrink(drink) {
+    setForm((prev) => {
+      const options = Array.isArray(prev.drinkOptions) ? prev.drinkOptions : []
+      const selectedIndex = options.findIndex(
+        (option) => String(option).trim().toLowerCase() === drink.toLowerCase(),
+      )
+
+      return {
+        ...prev,
+        drinkOptions:
+          selectedIndex >= 0
+            ? options.filter((_, index) => index !== selectedIndex)
+            : [...options, drink],
+      }
+    })
   }
 
   function removeOption(type, index) {
@@ -572,16 +608,53 @@ export default function MenuManagementTab({
                       <h4 className={styles.optionSectionTitle}>{activeOption.title}</h4>
                       <p className={styles.optionSectionSubtitle}>{activeOption.subtitle}</p>
                     </div>
+                    <span className={styles.selectedCount}>
+                      {activeOption.options.length} selected
+                    </span>
                   </div>
+
+                  {activeOptionTab === 'drink' && (
+                    <div className={styles.presetSection}>
+                      <div className={styles.presetHeading}>
+                        <span>Quick select</span>
+                        <small>Choose one or more common drinks.</small>
+                      </div>
+                      <div className={styles.presetGrid}>
+                        {PREDEFINED_DRINKS.map((drink) => {
+                          const selected = form.drinkOptions.some(
+                            (option) =>
+                              String(option).trim().toLowerCase() === drink.toLowerCase(),
+                          )
+
+                          return (
+                            <button
+                              key={drink}
+                              type="button"
+                              className={`${styles.presetOption} ${selected ? styles.presetSelected : ''}`}
+                              aria-pressed={selected}
+                              onClick={() => togglePredefinedDrink(drink)}
+                              disabled={readOnly}
+                            >
+                              <span className={styles.presetCheck} aria-hidden="true">
+                                {selected ? <Check size={14} /> : null}
+                              </span>
+                              {drink}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   <div className={styles.optionList}>
                     {activeOption.options.map((option, index) => (
-                      <div key={index} className={styles.optionItem}>
+                      <div key={`${option}-${index}`} className={styles.optionItem}>
                         <span>{option}</span>
                         <button
                           type="button"
                           className={styles.optionRemoveButton}
                           onClick={() => removeOption(activeOptionTab, index)}
+                          aria-label={`Remove ${option}`}
                         >
                           ×
                         </button>
@@ -595,6 +668,12 @@ export default function MenuManagementTab({
                       className={styles.input}
                       value={newOption[activeOptionTab]}
                       onChange={(e) => setNewOption(prev => ({ ...prev, [activeOptionTab]: e.target.value }))}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault()
+                          addOption(activeOptionTab)
+                        }
+                      }}
                       placeholder={activeOption.placeholder}
                       disabled={readOnly}
                     />

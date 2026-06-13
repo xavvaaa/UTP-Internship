@@ -8,7 +8,12 @@ import { useSession } from '../context/useSession'
 import { useToast } from '../context/useToast'
 import { getAuthToken } from '../utils/authToken'
 import { getSessionSummary, createSession, lookupFlightRoute } from '../services/flightSessionService'
-import { DEFAULT_SEAT_LAYOUT_ID, SEAT_LAYOUTS, getSeatLayoutOption } from '../data/seatLayouts'
+import {
+  DEFAULT_SEAT_LAYOUT_ID,
+  SEAT_LAYOUTS,
+  getSeatLayoutOption,
+  getSeatLayoutOptionForAircraft,
+} from '../data/seatLayouts'
 import SessionConfirmModal from '../components/common/SessionConfirmModal'
 import { BRAND_NAME, pageTitle } from '../constants/brand'
 import styles from './AdminSessionSelectionPage.module.css'
@@ -128,15 +133,20 @@ export default function AdminSessionSelectionPage() {
     try {
       setRouteLookupLoading(true)
       const token = await getAuthToken()
-      const result = await lookupFlightRoute(flightNumber, formData.date, token)
+      const result = await lookupFlightRoute(flightNumber, token)
       if (result.ok && result.route) {
-        setFormData((current) => ({
-          ...current,
-          date: current.date || result.flight_date || '',
-          departure_time: current.departure_time || result.departure_time || '',
-          route: result.route,
-        }))
-        showSuccess('Flight details found from real-time data')
+        setFormData((current) => {
+          const aircraftLayout = getSeatLayoutOptionForAircraft(result.aircraft_type)
+          return {
+            ...current,
+            date: result.flight_date || current.date,
+            departure_time: result.departure_time || current.departure_time,
+            route: result.route,
+            ...(aircraftLayout || {}),
+            aircraft_type: result.aircraft_type || current.aircraft_type,
+          }
+        })
+        showSuccess('Flight details found')
       } else {
         showError(result.error || 'Flight details not found')
       }
@@ -248,7 +258,7 @@ export default function AdminSessionSelectionPage() {
                     required
                   />
                   <span style={{ color: '#6b7280', fontSize: '0.75rem', fontWeight: '400', marginTop: '0.375rem' }}>
-                    Lookup only works for flights currently available in Aviationstack real-time data.
+                    Lookup only supports flights currently available in Aviationstack live data.
                   </span>
                 </label>
                 

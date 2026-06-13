@@ -167,11 +167,10 @@ export async function createSession(sessionData, token) {
   }
 }
 
-export async function lookupFlightRoute(flightNumber, date, token) {
+export async function lookupFlightRoute(flightNumber, token) {
   try {
     const params = new URLSearchParams({
       flight_number: String(flightNumber ?? '').trim().toUpperCase(),
-      date: String(date ?? '').trim(),
     })
     const response = await fetch(`${API_URL}/session/route-lookup?${params.toString()}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -187,6 +186,7 @@ export async function lookupFlightRoute(flightNumber, date, token) {
       arrival: data.arrival,
       departure_time: data.departure_time,
       flight_date: data.flight_date,
+      aircraft_type: data.aircraft_type,
       source: data.source,
     }
   } catch {
